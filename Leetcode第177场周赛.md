@@ -34,3 +34,65 @@ public:
     }
 };
 ```
+## LeetCode 1361. 验证二叉树
+
+![1361](1361.png)
+
+```c++
+class Solution {
+public:
+    bool validateBinaryTreeNodes(int n, vector<int>& leftChild, vector<int>& rightChild) {
+        vector<int> d(n);
+        for (int i = 0; i < n; i ++ ) {
+            if (leftChild[i] != -1) d[leftChild[i]] ++ ;
+            if (rightChild[i] != -1) d[rightChild[i]] ++ ;
+        }
+
+        int root = 0;
+        while (root < n && d[root]) root ++ ;
+
+        if (root == n) return false;
+
+        vector<bool> st(n);
+        st[root] = true;
+        queue<int> q;
+        q.push(root);
+
+        while (q.size()) {
+            int t = q.front();
+            q.pop();
+
+            int sons[] = {leftChild[t], rightChild[t]};
+            for (auto s : sons) {
+                if (s != -1) {
+                    if (st[s]) return false;
+                    st[s] = true;
+                    q.push(s);
+                }
+            }
+        }
+
+        for (auto state : st)
+            if (!state)
+                return false;
+
+        return true;
+    }
+};
+```
+## LeetCode 1362. 最接近的因数
+
+![1362](1362.png)
+
+```c++
+class Solution {
+public:
+    vector<int> closestDivisors(int num) {
+        for (int i = sqrt(num + 2); i; i -- ) {
+            if ((num + 1) % i == 0) return {i, (num + 1) / i};
+            if ((num + 2) % i == 0) return {i, (num + 2) / i};
+        }
+        return {};
+    }
+};
+```
