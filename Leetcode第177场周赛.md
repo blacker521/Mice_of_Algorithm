@@ -1,6 +1,6 @@
 ## LeetCode 1360. 日期之间隔几天
 
-![1360](C:\Users\black\Desktop\Acwing\Mice\1360.png)
+![1360](C:\Users\black\Desktop\Acwing\Mice_of_Algorithm\1360.png)
 
 ```c++
 class Solution {
