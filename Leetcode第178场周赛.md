@@ -24,7 +24,7 @@ public:
 
 };
 ```
-## LeetCode 1366. Rank Teams by Votes 
+## LeetCode 1366. Rank Teams by Votes  !!!
 
 ![1366](1366.png)
 
@@ -33,7 +33,7 @@ class Solution {
 public:
     string rankTeams(vector<string>& votes) {
         int n = votes[0].size();
-        vector<vector<int>> ranks(26, vector<int>(n + 1));
+        vector<vector<int>> ranks(26, vector<int>(n + 1));//二维数组，每个同学在各种排名下的次数。ranks[i][n]   ranks[选手][排名]
 
         for (int i = 0; i < 26; i ++ ) {
             ranks[i][n] = -i;
@@ -43,7 +43,7 @@ public:
             for (int i = 0; i < n; i ++ )
                 ranks[vote[i] - 'A'][i] ++ ;
 
-        sort(ranks.begin(), ranks.end(), greater<vector<int>>());
+        sort(ranks.begin(), ranks.end(), greater<vector<int>>());//从小到大排序。
 
         string res;
         for (int i = 0; i < n; i ++ ) res += -ranks[i][n] + 'A';
@@ -73,6 +73,7 @@ public:
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
+//枚举起点，然后往下继续找。
 class Solution {
 public:
     bool isSubPath(ListNode* head, TreeNode* root) {
@@ -82,9 +83,9 @@ public:
         return isSubPath(head, root->left) || isSubPath(head, root->right);  // 枚举起点
     }
 
-    bool dfs(ListNode* cur, TreeNode* root) {  // 起点已经固定，匹配的过程
-        if (!cur) return true;
-        if (!root) return false;
+    bool dfs(ListNode* cur, TreeNode* root) {  // 起点已经固定，匹配的过程，从当前点匹配能不能成功
+        if (!cur) return true;//链表已经匹配完。
+        if (!root) return false;//匹配不到。
 
         if (cur->val != root->val) return false;
 
