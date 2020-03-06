@@ -1,6 +1,10 @@
+---
+typora-root-url: ./
+---
+
 ## LeetCode 1365. How Many Numbers Are Smaller Than the Current Number
 
-![1365](C:\Users\black\Desktop\Acwing\Mice\1365.png)
+![1365](1365.png)
 
 ```c++
 class Solution {
@@ -22,7 +26,7 @@ public:
 ```
 ## LeetCode 1366. Rank Teams by Votes 
 
-![1366](C:\Users\black\Desktop\Acwing\Mice\1366.png)
+![1366](1366.png)
 
 ```c++
 class Solution {
@@ -49,7 +53,7 @@ public:
 ```
 ## LeetCode 1367. Linked List in Binary Tree
 
-![1367](C:\Users\black\Desktop\Acwing\Mice\1367.png)
+![1367](1367.png)
 
 ```c++
 /**
