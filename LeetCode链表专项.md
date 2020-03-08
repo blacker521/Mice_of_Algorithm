@@ -111,6 +111,13 @@ public:
 ![](206.png)
 
 ```c++
+/*指针变方向，递归
+双指针，
+c = b->next
+b ->next = a;
+a = b,b = c;
+b为空时a为头结点
+链表形式：a--b--c....
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -130,13 +137,32 @@ public:
         return p;
     }
 };
+***********************************************************************
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+		if(!head) return NULL;
+        
+        auto a = head,b = head->next;
+        while(b)
+        {
+            auto c = b->next;
+            b->next = a;
+            a = b,b = c;
+		}
+        head->next = NULL;
+        return a;
+    }
+};
 ```
 
 ## LeetCode 92. 反转链表 II
 
 ![](92.png)
 
+![](92_1.png)
 ```c++
+/*先求三个点的位置
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -148,7 +174,7 @@ public:
 class Solution {
 public:
     ListNode* reverseBetween(ListNode* head, int m, int n) {
-        if (m == n) return head;
+        if (m == n) return head;//不用操作
         ListNode *dummy = new ListNode(-1);
         dummy->next = head;
         ListNode *b = dummy;
@@ -220,7 +246,7 @@ public:
     }
 };
 
-简洁版
+***********************简洁版**************************
  /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -288,6 +314,193 @@ public:
             b->next = a;
             p = a;
         }
+        return dummy->next;
+    }
+};
+```
+
+## LeetCode 160. 相交链表 !!!
+
+![](160.png)
+
+![](160_1.png)
+
+```c++
+/*p,q都走完a+b+c之后一定相遇！！！妙啊~
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        ListNode *p = headA, *q = headB;
+        while (p != q)
+        {
+            if (p) p = p->next;
+            else p = headB;
+            if (q) q = q->next;
+            else q = headA;
+        }
+        return p;
+    }
+};
+```
+
+## LeetCode 142. 环形链表 II
+
+![](142.png)
+
+![](142_1.png)
+
+```c++
+/*
+1.快慢指针，快的每次走一步，慢的每次走两步。
+2.在环中每走y步两指针距离就少一
+3.相遇后把慢的放到开头
+4.快慢每次都走一步，当再次相遇时就是环的入口
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if (!head || !head->next) return 0;
+        ListNode *first = head, *second = head;
+
+        while (first && second)
+        {
+            first = first->next;
+            second = second->next;
+            if (second) second = second->next;
+            else return 0;
+
+            if (first == second)
+            {
+                first = head;
+                while (first != second)
+                {
+                    first = first->next;
+                    second = second->next;
+                }
+                return first;
+            }
+        }
+
+        return 0;
+    }
+};
+
+*******************************************************************
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        auto fast = head,slow = head;
+        while(fast)
+        {
+            fast = fast->next;
+            slow = slow->next;
+            if(fast) fast = fast->next;
+            else break;
+
+            if(fast == slow)
+            {
+                fast = head;
+                while(slow != fast)
+                {
+                    fast = fast->next;
+                    slow = slow->next;
+                }
+                return slow;
+            }
+        }
+        return NULL;
+    }
+};
+```
+
+## LeetCode 148. 排序链表
+
+![](148.png)
+
+![](148_1.png)
+
+```c++
+/*不能用递归，用归并排序
+空间复杂度O(1)
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        int n = 0;
+        for (ListNode *p = head; p; p = p->next) n ++ ;
+
+        ListNode *dummy = new ListNode(-1);
+        dummy->next = head;
+        for (int i = 1; i < n; i *= 2)
+        {
+            ListNode *begin = dummy;
+            for (int j = 0; j + i < n; j += i * 2)
+            {
+                ListNode *first = begin->next, *second = first;
+                for (int k = 0; k < i; k ++ )
+                    second = second->next;
+                int f = 0, s = 0;
+                while (f < i && s < i && second)
+                    if (first->val < second->val)
+                    {
+                        begin = begin->next = first;
+                        first = first->next;
+                        f ++ ;
+                    }
+                    else
+                    {
+                        begin = begin->next = second;
+                        second = second->next;
+                        s ++ ;
+                    }
+
+                while (f < i)
+                {
+                    begin = begin->next = first;
+                    first = first->next;
+                    f ++ ;
+                }
+                while (s < i && second)
+                {
+                    begin = begin->next = second;
+                    second = second->next;
+                    s ++ ;
+                }
+
+                begin->next = second;
+            }
+        }
+
         return dummy->next;
     }
 };
