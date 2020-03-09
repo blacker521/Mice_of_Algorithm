@@ -1,5 +1,5 @@
 ---
-typora-root-url: ./
+typora-root-url: img/
 ---
 ## LeetCode 1360. 日期之间隔几天
 

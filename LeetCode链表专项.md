@@ -1,4 +1,8 @@
-# *Week1-链表专题*
+---
+typora-root-url: img/
+---
+
+# *链表专题*
 ## LeetCode 19. 删除链表的倒数第N个节点
 
 ![19](19.png)
@@ -505,4 +509,258 @@ public:
     }
 };
 ```
+## LeetCode 21. 合并两个有序链表
 
+![](21.png)
+
+```c++
+/*建立虚拟节点，合并节点。
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        auto dummy = new ListNode(-1);
+        auto p = dummy;
+        while(l1 && l2)
+        {
+            if (l1->val < l2->val)
+            {
+                p->next = l1;
+                p = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                p->next = l2;
+                p = l2;
+                l2 = l2->next;
+            }
+        }
+        if (!l1) l1 = l2;
+        while(l1)
+        {
+            p->next = l1;
+            p = l1;
+            l1 = l1->next;
+        }
+        return dummy->next;
+    }
+};
+```
+## LeetCode 141. 环形链表
+
+![](141.png)
+
+![](141_1.png)
+
+```c++
+/*快慢指针，只要有环就一定能追上！！！
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if(!head || !head->next) return NULL;
+        auto first = head,second = head->next;
+        while(first && second)
+        {
+            if(first == second) return true;
+            first = first->next;
+            second = second->next;
+            if(second) second = second->next;
+        }
+        return false;
+    }
+};
+```
+## LeetCode 147. 对链表进行插入排序
+
+![](https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif)
+
+![](147.png)
+
+```c++
+/*建立虚拟头结点，指向原链表头部。
+然后扫描原链表，对于每个节点v，从前往后扫描结果链表，找到第一个比v大的节点u，将v
+插入到u之前。
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* insertionSortList(ListNode* head) {
+        auto dummy = new ListNode(-1);
+        while(head)
+        {
+            auto p = head->next,q = dummy;
+            while(q->next && q->next->val <= head->val) q = q->next;
+
+            head->next = q->next;
+            q->next = head;
+
+            head = p;
+        }
+        return dummy->next;
+    }
+};
+```
+## LeetCode 146. LRU缓存机制 !!!
+
+![](146.png)
+
+![](146_1.png)
+
+```c++
+class LRUCache {
+public:
+    struct Node
+    {
+        int val, key;
+        Node *left, *right;
+        Node() : key(0), val(0), left(NULL), right(NULL) {}
+    };
+    Node *hu, *tu; // hu: head_used, tu: tail_used; head在左侧，tail在右侧
+    Node *hr, *tr; // hr: head_remains, tr: tail_remains; head在左侧，tail在右侧
+    int n;
+    unordered_map<int, Node*> hash;
+
+    void delete_node(Node *p)
+    {
+        p->left->right = p->right, p->right->left = p->left;
+    }
+
+    void insert_node(Node *h, Node *p)
+    {
+        p->right = h->right, h->right = p;
+        p->left = h, p->right->left = p;
+    }
+
+    LRUCache(int capacity) {
+        n = capacity;
+        hu = new Node(), tu = new Node();
+        hr = new Node(), tr = new Node();
+        hu->right = tu, tu->left = hu;
+        hr->right = tr, tr->left = hr;
+
+        for (int i = 0; i < n; i ++ )
+        {
+            Node *p = new Node();
+            insert_node(hr, p);
+        }
+    }
+
+    int get(int key) {
+        if (hash[key])
+        {
+            Node *p = hash[key];
+            delete_node(p);
+            insert_node(hu, p);
+            return p->val;
+        }
+        return -1;
+    }
+
+    void put(int key, int value) {
+        if (hash[key])
+        {
+            Node *p = hash[key];
+            delete_node(p);
+            insert_node(hu, p);
+            p->val = value;
+            return;
+        }
+
+        if (!n)
+        {
+            n ++ ;
+            Node *p = tu->left;
+            hash[p->key] = 0;
+            delete_node(p);
+            insert_node(hr, p);
+        }
+
+        n -- ;
+        Node *p = hr->right;
+        p->key = key, p->val = value, hash[key] = p;
+        delete_node(p);
+        insert_node(hu, p);
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+```
+## LeetCode 138.复制带随机指针的链表
+
+![](138.png)
+
+![](138_1.png)
+
+```c++
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+
+    Node() {}
+
+    Node(int _val, Node* _next, Node* _random) {
+        val = _val;
+        next = _next;
+        random = _random;
+    }
+};
+*/
+class Solution {
+public:
+    Node *copyRandomList(Node *head) {
+        if (!head) return 0;
+        unordered_map<Node*, Node*> hash;
+        Node *root = new Node(head->val, NULL, NULL);
+        hash[head] = root;
+        while (head->next)
+        {
+            if (hash.count(head->next) == 0)
+                hash[head->next] = new Node(head->next->val, NULL, NULL);
+            hash[head]->next = hash[head->next];
+
+            if (head->random && hash.count(head->random) == 0)
+                hash[head->random] = new Node(head->random->val, NULL, NULL);
+            hash[head]->random = hash[head->random];
+
+            head = head->next;
+        }
+
+        if (head->random && hash.count(head->random) == 0)
+            hash[head->random] = new Node(head->random->val, NULL, NULL);
+        hash[head]->random = hash[head->random];
+
+        return root;
+    }
+};
+```

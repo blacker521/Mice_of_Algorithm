@@ -1,5 +1,5 @@
 ---
-typora-root-url: ./
+typora-root-url: img/
 ---
 
 ## LeetCode 1365. How Many Numbers Are Smaller Than the Current Number
