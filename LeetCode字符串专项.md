@@ -245,7 +245,9 @@ public:
 ```c++
 /*
 回文子串可以用马拉车Manacher算法降低到O(n)
-
+枚举回文串中心点，从中心点向两边扩展，找到最大扩展长度，直到不相同为止
+字符串长度为奇数是一个字母
+字符串长度为偶数是两个个字母
 */
 class Solution {
 public:
@@ -279,5 +281,250 @@ public:
         return str;
     }
 };
+***************************************************************************
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string res;
+        for(int i = 0;i < s.size();i ++)
+        {
+            for(int j = i,k = i;j >= 0 && k < s.size() && s[k] == s[j];j --,k ++)
+                if(res.size() < k - j + 1)
+                    res = s.substr(j,k - j + 1);
+            
+            for(int j = i,k = i + 1;j >= 0 && k < s.size() && s[k] == s[j];j --,k ++)
+                if(res.size() < k - j + 1)
+                    res = s.substr(j,k - j + 1);
+        }
+        return res;
+    }
+};
 ```
 
+## LeetCode 6.  Z 字形变换
+
+![](6.png)
+
+![](6_1.png)
+
+```c++
+/*
+找规律
+第一行首项是0，公差是2(n-1)的等差数列
+两个等差数列交错
+最后一行，首项是n-1公差是2(n-1)的等差数列
+*/
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        string res;
+        if (numRows == 1) return s;
+        for (int j = 0; j < numRows; j ++ )
+        {
+            if (j == 0 || j == numRows - 1)
+            {
+                for (int i = j; i < s.size(); i += (numRows-1) * 2)
+                    res += s[i];
+            }
+            else
+            {
+                for (int k = j, i = numRows * 2 - 1 - j - 1;
+                        i < s.size() || k < s.size();
+                        i += (numRows - 1) * 2, k += (numRows - 1) * 2)
+                {
+                    if (k < s.size()) res += s[k];
+                    if (i < s.size()) res += s[i];
+                }
+            }
+        }
+        return res;
+    }
+};
+**************************************************************************
+class Solution {
+public:
+    string convert(string s, int n) {
+        if(n == 1) return s;
+        string res;
+        for(int i = 0;i < n;i ++)
+        {
+            if(!i || i == n -1)
+            {
+                for(int j = i;j < s.size();j += 2 * (n - 1)) res += s[j];
+            }
+            else
+            {
+                for(int j = i,k = 2 * (n - 1) - i;j < s.size() || k < s.size();j += 2 *(n - 1),k += 2 * (n - 1))
+                {
+                    if(j < s.size()) res += s[j];
+                    if(k < s.size()) res += s[k];
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+## LeetCode 3.无重复字符的最长子串
+
+![](3.png)
+
+![](3_1.png)
+
+```c++
+/*
+最长且不包含重复字符的子串
+先想暴力O(n^2)
+for(int i = 0;i < s.size();i ++)
+	for(int j = i;j >= 0;j --)
+		if(check() == false)
+			break;
+优化
+单调性O(n)
+后面指针往后走，前面指针一定单调往后走
+后面走一下，判断一下前面指针是不是要往后走
+用hash存储每个字母出现的次数
+i是前一个指针，j是后一个指针
+*/
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_map<char, int> hash;
+        int res = 0;
+        for (int i = 0, j = 0; j < s.size(); j ++ )
+        {
+            hash[s[j]] ++ ;
+            while (hash[s[j]] > 1) hash[s[i ++ ]] -- ;//如果有重复字母，一定是是s[j]!!!
+            res = max(res, j - i + 1);
+        }
+        return res;
+    }
+};
+```
+## LeetCode 208.实现 Trie (前缀树)
+
+![](208.png)
+
+![](208_1.png)
+
+```c++
+/*
+Trie树
+*/
+class Trie {
+public:
+    struct Node
+    {
+        bool is_end;
+        Node *son[26];//儿子节点
+        Node()
+        {
+            is_end = false;
+            for(int i = 0;i < 26;i ++) son[i] = NULL;
+        }
+    }*root;
+    /** Initialize your data structure here. */
+    Trie() {
+        root = new Node();
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        auto p = root;
+        for(auto c : word)
+        {
+            int u = c - 'a';//求编号
+            if(p->son[u] == NULL) p->son[u] = new Node();//儿子不存在就创建
+            p = p->son[u];
+        }
+        p->is_end = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        auto p = root;
+        for(auto c : word)
+        {
+            int u = c - 'a';
+            if(p->son[u] == NULL) return false;
+            p = p->son[u];
+        }
+        return p->is_end;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        auto p = root;
+        for(auto c : prefix)
+        {
+            int u = c - 'a';
+            if(p->son[u] == NULL) return false;
+            p = p->son[u];
+        }
+        return true;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+```
+## LeetCode 273. 整数转换英文表示
+
+![](273.png)
+
+![](273_1.png)
+
+```c++
+class Solution {
+public:
+    int hundred = 100, thousand = 1000, million = 1000000, billion = 1000000000;
+    unordered_map<int, string> numbers;
+
+    string numberToWords(int num) {
+        char number20[][30] = {"Zero", "One", "Two", "Three", "Four", "Five", 
+                               "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", 
+                               "Twelve", "Thirteen", "Fourteen", "Fifteen", 
+                               "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+        char number2[][30] = {"Twenty", "Thirty", "Forty", "Fifty", "Sixty", 
+                              "Seventy", "Eighty", "Ninety"};
+        for (int i = 0; i < 20; i ++ ) numbers[i] = number20[i];
+        for (int i = 20, j = 0; i < 100; i += 10, j ++ ) numbers[i] = number2[j];
+        numbers[hundred] = "Hundred", numbers[thousand] = "Thousand";
+        numbers[million] = "Million", numbers[billion] = "Billion";
+        string res;
+        for (int k = 1000000000; k >= 100; k /= 1000)
+        {
+            if (num >= k)
+            {
+                res += ' ' + get3(num / k) + ' ' + numbers[k];
+                num %= k;
+            }
+        }
+        if (num) res += ' ' + get3(num);
+        if (res.empty()) res = ' ' + numbers[0];
+        return res.substr(1);
+    }
+
+    string get3(int num)
+    {
+        string res;
+        if (num >= hundred)
+        {
+            res += ' ' + numbers[num / hundred] + ' ' + numbers[hundred];
+            num %= hundred;
+        }
+        if (num)
+        {
+            if (num < 20) res += ' ' + numbers[num];
+            else if (num % 10 == 0) res += ' ' + numbers[num];
+            else res += ' ' + numbers[num / 10 * 10] + ' ' + numbers[num % 10];
+        }
+        return res.substr(1);
+    }
+};
+```
