@@ -340,3 +340,345 @@ public:
     }
 };
 ```
+
+## LeetCode 216. 组合总和 III
+
+![](216.png)
+
+![](216_1.png)
+
+```c++
+/*
+依次枚举每个数从哪个位置上选
+dfs(枚举到了第几个数字，当前选择的所有数的和，开始枚举的位置)
+倒着枚举 
+*/
+
+class Solution {
+public:
+    vector<vector<int>> ans;
+    vector<int> path;
+
+    vector<vector<int>> combinationSum3(int k, int n) {
+        dfs(k, n, 1);
+        return ans;
+    }
+
+    void dfs(int k, int n, int start)
+    {
+        if (!k)
+        {
+            if (!n) ans.push_back(path);
+            return;
+        }
+
+        for (int i = start; i <= 10 - k; i ++ )
+            if (n >= i)
+            {
+                path.push_back(i);
+                dfs(k - 1, n - i, i + 1);
+                path.pop_back();
+            }
+    }
+};
+*********************************************************************
+class Solution {
+public:
+    vector<vector<int>> ans;
+    vector<int> path;
+    vector<vector<int>> combinationSum3(int k, int n) {
+        dfs(k,1,n);
+        return ans;
+    }
+
+    void dfs(int k,int start,int n)
+    {
+        if(!k)//枚举完所有数
+        {
+            if(!n) ans.push_back(path);//总和也是倒着来
+            return;
+        }
+
+        for(int i = start;i <= 9;i ++)
+        {
+            path.push_back(i);
+            dfs(k - 1,i + 1,n - i);
+            path.pop_back();
+        }
+    }
+};
+```
+
+## LeetCode 52. N皇后 II
+
+![](52.png)
+
+```c++
+//暴力
+class Solution {
+public:
+    int ans;
+    vector<bool> row, col, diag, anti_diag;
+
+    int totalNQueens(int n) {
+        row = col = vector<bool>(n, false);
+        diag = anti_diag = vector<bool>(2 * n, false);
+        ans = 0;
+        dfs(0, 0, 0, n);
+        return ans;
+    }
+
+    void dfs(int x, int y, int s, int n)
+    {
+        if (y == n) x ++ , y = 0;
+        if (x == n)
+        {
+            if (s == n) ++ ans;
+            return ;
+        }
+
+        dfs(x, y + 1, s, n);
+        if (!row[x] && !col[y] && !diag[x + y] && !anti_diag[n - 1 - x + y])
+        {
+            row[x] = col[y] = diag[x + y] = anti_diag[n - 1 - x + y] = true;
+            dfs(x, y + 1, s + 1, n);
+            row[x] = col[y] = diag[x + y] = anti_diag[n - 1 - x + y] = false;
+        }
+    }
+};
+**************************************************************************************
+/*
+依次枚举每一行皇后的位置，且不与上面冲突
+精确覆盖问题，Dancing Link算法
+*/
+class Solution {
+public:
+
+    int ans = 0,n;
+    vector<bool> col,d,ud;
+    int totalNQueens(int _n) {
+        n = _n;//把n做成全局变量
+        col = vector<bool>(n);
+        d = ud = vector<bool>(n * 2);
+        dfs(0); 
+
+        return ans;
+    }
+    
+    void dfs(int u)
+    {
+        if(u == n )//找到了一个方案
+        {
+            ans ++;
+            return;
+        }
+
+        for(int i = 0;i < n;i ++)
+            if(!col[i] && !d[u + i] && !ud[u - i + n])
+            {
+                col[i] = d[u + i] = ud[u - i + n] = true;
+                dfs(u + 1);
+                col[i] = d[u + i] = ud[u - i + n] = false;
+            }
+    }
+};
+```
+
+## LeetCode 37. 解数独
+
+![](37.png)
+
+![](37_1.png)
+
+```c++
+class Solution {
+public:
+    bool dfs(int x, int y, vector<vector<char>>& board,
+            vector<int>& row, vector<int>& col, vector<int>& squ) {
+        if (y == 9) {
+            x++;
+            y = 0;
+        }
+        if (x == 9)
+            return true;
+        if (board[x][y] == '.') {
+            for (int i = 1; i <= 9; i++)
+                if (! (
+                    (row[x] & (1 << i)) ||
+                    (col[y] & (1 << i)) ||
+                    (squ[(x / 3) * 3 + (y / 3)] & (1 << i))
+                    )
+                   ) {
+                    row[x] |= (1 << i);
+                    col[y] |= (1 << i);
+                    squ[(x / 3) * 3 + (y / 3)] |= (1 << i);
+                    board[x][y] = i + '0';
+                    if(dfs(x, y + 1, board, row, col, squ))
+                        return true;
+                    board[x][y] = '.';
+                    row[x] -= (1 << i);
+                    col[y] -= (1 << i);
+                    squ[(x / 3) * 3 + (y / 3)] -= (1 << i);
+                }
+        }
+        else {
+            if (dfs(x, y + 1, board, row, col, squ))
+                return true;
+        }
+        return false;
+    }
+
+    void solveSudoku(vector<vector<char>>& board) {
+
+        vector<int> row(9), col(9), squ(9);
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] == '.')
+                    continue;
+                int num = board[i][j] - '0';
+                row[i] |= (1 << num);
+                col[j] |= (1 << num);
+                squ[(i / 3) * 3 + (j / 3)] |= (1 << num);
+            }
+
+        dfs(0, 0, board, row, col, squ);
+    }
+};
+************************************************
+/*从前往后枚举每个空格该填哪个数
+状态：row[9][9],col[9][9],cell[3][3][9]
+精确覆盖问题，Dancing Links算法
+*/    
+class Solution {
+public:
+    bool row[9][9] = {0},col[9][9] = {0},cell[3][3][9] = {0};//初始化
+    void solveSudoku(vector<vector<char>>& board) {
+        for(int i = 0;i < 9;i ++)
+            for(int j = 0;j < 9;j ++)
+            {
+                char c = board[i][j];
+                if(c != '.')
+                {
+                    int t = c - '1';
+                    row[i][t] = col[j][t] = cell[i / 3][j / 3][t] = true;
+                }
+            }
+
+        dfs(board,0,0);//左上角开始走
+    }
+
+    bool dfs(vector<vector<char>> &board,int x,int y)//board是引用类型
+    {
+        if(y == 9) x ++ ,y = 0;//出界就去下一行
+        if(x == 9) return true;//整个数都做完了
+        if(board[x][y] != '.') return dfs(board,x,y + 1);//已经填了数，调到下一个
+
+        for(int i = 0;i < 9;i ++)
+        {
+            if(!row[x][i] && !col[y][i] && !cell[x / 3][y / 3][i])
+            {
+                board[x][y] = '1' + i;//更新状态
+                row[x][i] = col[y][i] = cell[x / 3][y / 3][i] = true;
+                if(dfs(board,x,y + 1)) return true;
+                row[x][i] = col[y][i] = cell[x / 3][y / 3][i] = false;
+                board[x][y] = '.';//恢复状态
+            }
+        }
+        return false;
+    }
+};
+```
+
+## LeetCode 473. 火柴拼正方形
+
+![](473.png)
+
+![](473_1.png)
+
+```c++
+bool cmp(int x,int y){
+    return x>y;
+}
+class Solution {
+public:
+    bool makesquare(vector<int>& nums) {
+        if (nums.size() == 0) return false;
+        int sum = 0;
+        for (int i = 0;i<nums.size();++i){
+            sum += nums[i];
+        }
+        int len = sum/4;
+        if (len*4 != sum)
+            return false;
+
+
+        sort(nums.begin(),nums.end(),cmp);
+        vector<int> SubSum(4);
+        bool res = dfs(nums,SubSum,len,0);
+        return res;
+
+    }
+    bool dfs(vector<int>&nums,vector<int>SubSum,int len,int index){
+        if (SubSum[0] == len && SubSum[1] == len && SubSum[2] == len){
+            return true;
+        }
+        for (int i = 0;i<4;++i){
+            if (SubSum[i]+nums[index]> len) continue;
+            SubSum[i] += nums[index];
+            if (dfs(nums,SubSum,len,index+1)) return true;
+            SubSum[i] -= nums[index];
+        }
+        return false;
+
+
+    }
+};
+**************************************************************************
+/*
+依次构造正方形的每条边
+剪枝：
+1.从大到小枚举所有边
+2.每条内部的木棒长度规定成从大到小
+3.如果当前木棒拼接失败，则跳过接下来所有长度相同的木棒
+4.如果当前木棒拼接失败，且是当前边的第一个，则直接减掉当前分支
+5.如果当前木棒拼接失败，且是当前边的最后一个，则直接减掉当前分支
+*/
+class Solution {
+public:
+    vector<bool> st;
+
+    bool makesquare(vector<int>& nums) {
+        int sum = 0;
+        for(auto u : nums) sum += u;
+
+        if(!sum || sum % 4) return false;
+
+        sort(nums.begin(),nums.end());//第一、二个剪枝
+        reverse(nums.begin(),nums.end());
+
+        st = vector<bool>(nums.size());
+        return dfs(nums,0,0,sum / 4);
+    }
+
+    bool dfs(vector<int> &nums,int u, int cur,int length)
+    {
+        if(cur == length) u ++,cur = 0;
+        if(u == 4) return true;
+
+        for(int i = 0;i < nums.size();i ++)
+        {
+            if(!st[i] && cur + nums[i] <= length)
+            {
+                st[i] = true;
+                if(dfs(nums,u,cur + nums[i],length)) return true;
+                st[i] = false;
+                if(!cur) return false;//第四个剪枝
+                if(cur + nums[i] == length) return false;//第五个剪枝
+                while(i + 1 < nums.size() && nums[i + 1] == nums[i]) i ++;//第三个剪枝
+            }
+
+        }
+    return false;
+    }
+};
+```
