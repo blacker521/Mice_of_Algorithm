@@ -490,7 +490,15 @@ public:
 
 ## LeetCode 124.  二叉树中的最大路径和
 
+![](124.png)
+
+![](124_1.png)
+
 ```c++
+/*
+枚举最高点
+左右两边的最大权重
+向左走，向右走，不走，三种情况，取最大值
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -507,7 +515,7 @@ public:
         dfs(root);
         return ans;
     }
-
+	//从root向下走的最大值
     int dfs(TreeNode *root)
     {
         if(!root) return 0;
@@ -515,8 +523,247 @@ public:
         auto left = dfs(root->left);
         auto right = dfs(root->right);
         ans = max(ans,left + root->val + right);
-        return max(0,root->val + max(left,right));
+        return max(0,root->val + max(left,right));//向左走，向右走，不走，三种情况，取最大值
     }
 };
+```
+
+## LeetCode 173. 二叉搜索树迭代器
+
+![](173.png)
+
+![](173_1.png)
+
+```c++
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class BSTIterator {
+public:
+    stack<TreeNode*> st;
+    BSTIterator(TreeNode *root) {
+        TreeNode *p = root;
+        while (p) {
+            st.push(p);
+            p = p -> left;
+        }
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !st.empty();
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        TreeNode *cur = st.top();
+        st.pop();
+        int v = cur -> val;
+        cur = cur -> right;
+        while (cur) {
+            st.push(cur);
+            cur = cur -> left;
+        }
+        return v;
+    }
+};
+
+/**
+ * Your BSTIterator will be called like this:
+ * BSTIterator i = BSTIterator(root);
+ * while (i.hasNext()) cout << i.next();
+ */
+*******************************************************************************
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class BSTIterator {
+public:
+    stack<TreeNode*> stk;
+    BSTIterator(TreeNode* root) {
+        while(root)
+        {
+            stk.push(root);
+            root = root->left;
+        }
+    }
+    
+    /** @return the next smallest number */
+    int next() {
+        auto p = stk.top();
+        stk.pop();
+        int res = p->val;
+        p = p->right;
+        while(p)         //p不为空就把p最左边的链加入栈中
+        {
+            stk.push(p);
+            p = p->left;
+        }
+
+        return res;
+    }
+    
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !stk.empty();
+    }
+};
+
+/**
+ * Your BSTIterator object will be instantiated and called as such:
+ * BSTIterator* obj = new BSTIterator(root);
+ * int param_1 = obj->next();
+ * bool param_2 = obj->hasNext();
+ */
+```
+## LeetCode 297. 二叉树的序列化与反序列化
+
+![](297.png)
+
+![](297_1.png)
+
+```c++
+/*
+序列化
+前序遍历，用逗号隔开，空的为#号
+
+反序列化
+先左子树，再右子树
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+
+    void solve(TreeNode* root, string& s) {
+        if (root == NULL) {
+            s += ",";
+            return;
+        }
+        s += to_string(root -> val) + ",";
+        solve(root -> left, s);
+        solve(root -> right, s);
+    }
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        string s = "";
+        solve(root, s);
+        return s;
+    }
+
+    TreeNode* decode(int &cur, const string& data) {
+        if (data[cur] == ',') {
+            cur++;
+            return NULL;
+        }
+        int nxt = data.find(',', cur);
+        int val = stoi(data.substr(cur, nxt - cur));
+        TreeNode *r = new TreeNode(val);
+        cur = nxt + 1;
+        r -> left = decode(cur, data);
+        r -> right = decode(cur, data);
+        return r;
+    }
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        int cur = 0;
+        return decode(cur, data);
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
+***********************************************************************************
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        string res;
+        dfs1(root,res);//不能直接用返回值
+        return res;
+    }
+    void dfs1(TreeNode *root,string &res)
+    {
+        if(!root)
+        {
+            res += "#,";
+            return;
+        }
+
+        res += to_string(root->val) + ',';
+        dfs1(root->left,res);
+        dfs1(root->right,res);
+    }
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        int u = 0;
+        return dfs2(data,u);
+        
+    }
+    TreeNode* dfs2(string &data,int &u)
+    {
+        if(data[u] == '#')
+        {
+            u += 2;
+            return NULL;
+        }
+
+        int t = 0;
+        bool is_minus = false;
+        if(data[u] == '-')
+        {
+            is_minus = true;
+            u ++;
+        }
+        while(data[u] != ',')
+        {
+            t = t * 10 + data[u] - '0';
+            u ++;
+        }
+        u ++;
+        if(is_minus) t = -t;
+
+        auto root = new TreeNode(t);
+        root->left = dfs2(data,u);
+        root->right = dfs2(data,u);
+
+        return root;
+
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
 ```
 
