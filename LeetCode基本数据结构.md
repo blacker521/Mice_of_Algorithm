@@ -352,11 +352,12 @@ public:
 并查集作用O(1)
 1.合并两个集合
 2.判断连个点是否在同一集合中
+
 */
 class Solution {
 public:
     int n;
-    vector<int> f;
+    vector<int> f;//父节点
 
     int find(int x) {
         return x == f[x] ? x : f[x] = find(f[x]);
@@ -367,7 +368,7 @@ public:
         for (int i = 0; i < n; i++)
             f[i] = i;
         for (int i = 0; i < n; i++)
-            for (int j = i + 1; j < n; j++)
+            for (int j = i + 1; j < n; j++)//无向图，遍历一半就可以
                 if (M[i][j] == 1) {
                     int fx = find(i), fy = find(j);
                     if (fx != fy)
@@ -381,4 +382,312 @@ public:
         return ans;
     }
 };
+```
+
+## LeetCode 684. 冗余连接
+
+![](684.png)
+
+```c++
+/*
+出现环的条件是某条边，边的两个端点原本就是连通的，那么加上了这条边以后就产生了环，因此我们在加入每条边的时候需要判断一下边的两个端点本身是不是连通的即可。
+
+如果连通且不在一个集合之中就合并集合，否则这边就是要求的边
+*/
+class UnionFind{
+public:
+    vector<int>father;
+    UnionFind(int num){//num表示元素的个数
+        for(int i = 0; i < num; i++){
+            father.push_back(i);//箭头指向自己
+        }
+    }
+    int Find(int n){
+        //递归
+        if(father[n] == n)
+            return n;
+        father[n] = Find(father[n]);//路径压缩版本
+        return father[n];
+    }
+    bool Union(int a, int b){//返回a和b是否本身在一个集合里
+        int fa = Find(a);
+        int fb = Find(b);
+        bool res = fa==fb;
+        father[fb] = fa;
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int N = edges.size();
+        UnionFind UF(N+1);
+        vector<int>res(2, 0);
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            if(UF.Union(u, v)){//冗余
+                res[0] = u;
+                res[1] = v;
+            }
+        }
+        return res;
+    }
+};
+*******************************************************************
+class Solution {
+public:
+    vector<int> p;
+
+    int find(int x)
+    {
+        if(p[x] != x) p[x] = find(p[x]);
+        return p[x];
+    }
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+
+        for(int i = 0;i <= n;i ++) p.push_back(i);
+
+        for(auto e : edges)
+        {
+            int a = e[0],b = e[1];
+            if(find(a) == find(b)) return {a,b};
+            p[find(a)] = find(b);
+        }
+        return {-1,-1};
+    }
+};
+```
+
+## LeetCode 692.前K个高频单词
+
+![](692.png)
+
+![](692_1.png)
+
+```c++
+/*
+找出出现次数最多的k个单词
+用小根堆来委会出现次数最多的k个单词
+*/
+class Solution {
+public:
+
+    vector<string> topKFrequent(vector<string>& words, int k) {
+        unordered_map<string, int> hash;
+
+        typedef pair<int, string> PIS;
+        priority_queue<PIS> heap;
+        for (auto word : words) hash[word] ++ ;
+
+        for (auto item : hash)
+        {
+            PIS t(-item.second, item.first);
+            if (heap.size() == k && t < heap.top()) heap.pop();
+            if (heap.size() < k) heap.push(t);
+        }
+
+        vector<string> res(k);
+        for (int i = k - 1; i >= 0; i -- )
+        {
+            res[i] = heap.top().second;
+            heap.pop();
+        }
+
+        return res;
+    }
+};
+******************************************************************
+class Solution {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k) {
+        unordered_map<string,int> hash;
+        typedef pair<int,string> PIS;
+        priority_queue<PIS> heap;
+
+        for(auto word : words) hash[word] ++;
+
+        for(auto item : hash)
+        {
+            PIS t(-item.second,item.first);
+            heap.push(t);
+            if(heap.size() > k) heap.pop(); 
+        }
+
+        vector<string> res(k);
+        for(int i = k - 1;i >= 0;i --)
+        {
+            res[i] = heap.top().second;
+            heap.pop();
+        }
+        return res;
+    }
+};
+```
+
+## LeetCode 295.数据流的中位数
+
+![](295.png)
+
+![](295_1.png)
+
+![](295_2.png)
+
+```c++
+//维护下面的比上面的最多少一个！！！
+class MedianFinder {
+public:
+    /** initialize your data structure here. */
+    priority_queue<int> smaller;
+    priority_queue<int, vector<int>, greater<int>> larger;
+    MedianFinder() {
+
+    }
+
+    void addNum(int num) {
+        if (smaller.empty() || num <= smaller.top())
+            smaller.push(num);
+        else
+            larger.push(num);
+
+        if (smaller.size() == larger.size() + 2) {
+            int top = smaller.top();
+            smaller.pop();
+            larger.push(top);
+        }
+        else if (larger.size() == smaller.size() + 1) {
+            int top = larger.top();
+            larger.pop();
+            smaller.push(top);
+        }
+    }
+
+    double findMedian() {
+        if (smaller.size() == larger.size())
+            return (smaller.top() + larger.top()) / 2.0;
+
+        return smaller.top();
+    }
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder obj = new MedianFinder();
+ * obj.addNum(num);
+ * double param_2 = obj.findMedian();
+ */
+*****************************************************************************
+class MedianFinder {
+public:
+    /** initialize your data structure here. */
+    priority_queue<int> down;//下面的
+    priority_queue<int,vector<int>,greater<int>> up;//上面的
+    MedianFinder() {
+
+    }
+    
+    void addNum(int num) {
+        if(down.empty() || num >= down.top()) up.push(num);
+        else
+        {
+            down.push(num);//每次要往下面添加时，先添加，再往上拿一个，拿下面最大的
+            up.push(down.top());
+            down.pop();
+        }
+        if(up.size() > down.size() + 1)//上面多了，往下拿最小的
+        {
+            down.push(up.top());
+            up.pop();
+        }
+    }
+    
+    double findMedian() {
+        if(down.size() + up.size() & 1) return up.top();//总数是奇数
+        else return (down.top() + up.top()) / 2.0;//总数是偶数
+    }
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+```
+
+## LeetCode 352. 将数据流变为多个不相交区间
+
+![](352.png)
+
+![](352_1.png)
+
+```c++
+/**
+ * Definition for an interval.
+ * struct Interval {
+ *     int start;
+ *     int end;
+ *     Interval() : start(0), end(0) {}
+ *     Interval(int s, int e) : start(s), end(e) {}
+ * };
+ */
+class SummaryRanges {
+public:
+    /** Initialize your data structure here. */
+    map<int,int>L, R;
+    SummaryRanges() {
+
+    }
+
+    void addNum(int val) {
+        if (R.size())
+        {
+            auto it = R.upper_bound(val);
+            if (it != R.begin())
+            {
+                -- it;
+                if (it->second >= val) return;
+            }
+        }
+        int right = R.count(val + 1), left = L.count(val - 1);
+        if (left && right)
+        {
+            R[L[val - 1]] = R[val + 1];
+            L[R[val + 1]] = L[val - 1];
+            R.erase(val + 1), L.erase(val - 1);
+        }
+        else if (right)
+        {
+            L[R[val + 1]] = val;
+            R[val] = R[val + 1];
+            R.erase(val + 1);
+        }
+        else if (left)
+        {
+            R[L[val - 1]] = val;
+            L[val] = L[val - 1];
+            L.erase(val - 1);
+        }
+        else
+        {
+            R[val] = val;
+            L[val] = val;
+        }
+    }
+
+    vector<Interval> getIntervals() {
+        vector<Interval> res;
+        for (auto &p : R) res.push_back(Interval(p.first, p.second));
+        return res;
+    }
+};
+
+/**
+ * Your SummaryRanges object will be instantiated and called as such:
+ * SummaryRanges obj = new SummaryRanges();
+ * obj.addNum(val);
+ * vector<Interval> param_2 = obj.getIntervals();
+ */
 ```
