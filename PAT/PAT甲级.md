@@ -154,3 +154,126 @@ int main()
     }
 }
 ```
+## 1036 Boys vs Girls (25分)
+
+![](1036.png)
+
+![](1036-1.png)
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    int n;
+    string girl_name,girl_id;
+    int girl_score,boy_score;
+    string boy_name,boy_id;
+    cin >> n;
+    for(int i = 0;i < n;i ++)
+    {
+        string name,sex,id;
+        int score;
+        cin >> name >> sex >> id >> score;
+        if(sex == "F")
+        {
+            if(girl_name.empty() || girl_score < score)
+            {
+                girl_name = name;
+                girl_id = id;
+                girl_score = score;
+            }
+        }
+        else
+        {
+            if(boy_name.empty() || boy_score > score)
+            {
+                boy_name = name;
+                boy_id = id;
+                boy_score = score;
+            }
+        }
+    }
+    if(girl_name.empty()) puts("Absent");
+    else cout << girl_name << ' ' << girl_id << endl;
+    
+    if(boy_name.empty()) puts("Absent");
+    else cout << boy_name << ' ' << boy_id << endl;
+    
+    if(girl_name.size() && boy_name.size()) cout << abs(girl_score - boy_score);
+    else cout << "NA" << endl;
+    
+}
+```
+## 1050 String Subtraction (20分)
+
+![](1050.png)
+
+```c++
+#include <iostream>
+#include <unordered_set>
+
+using namespace std;
+
+int main()
+{
+    string s1,s2;
+    getline(cin,s1);
+    getline(cin,s2);
+    unordered_set<char> hash;
+    
+    for(auto c:s2) hash.insert(c);
+    
+    string res;
+    for(auto c:s1)
+        if(!hash.count(c))
+            res += c;
+    cout << res << endl;
+}
+```
+## 1071 Speech Patterns (25分)
+
+![](1071.png)
+
+```c++
+#include <iostream>
+#include <unordered_map>
+using namespace std;
+
+bool check(char c)
+{
+    if(c >= '0' && c <= '9') return true;
+    if(c >= 'a' && c <= 'z') return true;
+    if(c >= 'A' && c <= 'Z') return true;
+    return false;
+}
+int main()
+{ 
+    string s;
+    getline(cin,s);
+    
+    unordered_map<string,int> hash;
+    
+    for(int i = 0;i < s.size();i ++)
+        if(check(s[i]))
+        {
+            string word;
+            int j = i;
+            while(j < s.size() && check(s[j])) word += tolower(s[j ++]);
+            
+            hash[word] ++;
+            i = j; 
+        }
+    string word;
+    int cnt = -1;
+    for(auto item : hash)
+        if(item.second > cnt || item.second == cnt && item.first < word)
+        {
+            word = item.first;
+            cnt = item.second;
+        }
+    cout << word <<' ' << cnt << endl;
+}
+```
