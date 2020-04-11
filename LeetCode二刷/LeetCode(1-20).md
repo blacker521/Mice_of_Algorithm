@@ -221,6 +221,25 @@ class Solution {
 
 ![](11.png)
 
+```c++
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int res = 0;
+        for (int i = 0, j = height.size() - 1; i < j; )
+        {
+            res = max(res, 
+                min(height[i], height[j]) * (j - i));
+            if (height[i] > height[j]) j -- ;
+            else i ++ ;
+        }
+        return res;
+    }
+};
+```
+
+
+
 ## 12. 整数转罗马数字
 
 ![](12.png)
@@ -250,21 +269,22 @@ public:
 ```c++
 class Solution {
 public:
-    string intToRoman(int num)
-    {
-        char* c[4][10] = {
-            {"","I","II","III","IV","V","VI","VII","VIII","IX"},
-            {"","X","XX","XXX","XL","L","LX","LXX","LXXX","XC"},
-            {"","C","CC","CCC","CD","D","DC","DCC","DCCC","CM"},
-            {"","M","MM","MMM"}
-        };
-        string roman;
-        roman.append(c[3][num / 1000]);
-        roman.append(c[2][num / 100 % 10]);
-        roman.append(c[1][num / 10 % 10]);
-        roman.append(c[0][num % 10]);
-         
-        return roman;
+    int romanToInt(string s) {
+        int n = s.length(), ans = 0;
+        unordered_map<char, int> words;
+        words['I'] = 1; words['V'] = 5;
+        words['X'] = 10; words['L'] = 50; 
+        words['C'] = 100; words['D'] = 500;
+        words['M'] = 1000;
+        for (int i = 0; i < n; i++) {
+            if (i != n - 1 && words[s[i + 1]] > words[s[i]]) {
+                ans += words[s[i + 1]] - words[s[i]];
+                i++;
+            }
+            else
+                ans += words[s[i]];
+        }
+        return ans;
     }
 };
 ```
