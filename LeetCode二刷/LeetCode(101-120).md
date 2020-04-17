@@ -270,36 +270,36 @@ public:
  */
 class Solution {
 public:
-        vector<int> get_val(vector<TreeNode*> level)
+    vector<int> get_val(vector<TreeNode*> level)
     {
         vector<int> res;
-        for (auto &u : level)
+        for(auto &u : level)
             res.push_back(u->val);
         return res;
     }
-
     vector<vector<int>> levelOrderBottom(TreeNode* root) {
-        vector<vector<int>>res;
-        if (!root) return res;
-        vector<TreeNode*>level;
+        vector<vector<int>> res;
+        if(!root) return res;
+        vector<TreeNode*> level;
         level.push_back(root);
         res.push_back(get_val(level));
-        while (true)
+        while(true)
         {
-            vector<TreeNode*> newLevel;
-            for (auto &u : level)
+            vector<TreeNode*> newlevel;
+            for(auto &u : level)
             {
-                if (u->left) newLevel.push_back(u->left);
-                if (u->right) newLevel.push_back(u->right);
+                if(u->left) newlevel.push_back(u->left);
+                if(u->right) newlevel.push_back(u->right);
             }
-            if (newLevel.size())
+
+            if(newlevel.size())
             {
-                res.push_back(get_val(newLevel));
-                level = newLevel;
+                res.push_back(get_val(newlevel));
+                level = newlevel;
             }
             else break;
         }
-        reverse(res.begin(), res.end());
+        reverse(res.begin(),res.end());
         return res;
     }
 };
