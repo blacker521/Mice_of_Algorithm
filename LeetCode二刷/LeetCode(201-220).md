@@ -2,9 +2,9 @@
 typora-root-url: img
 ---
 
-## 81. 搜索旋转排序数组 II
+## 201. 数字范围按位与
 
-![](81.png)
+![](201.png)
 
 ```c++
 class Solution {
@@ -20,9 +20,36 @@ public:
     }
 };
 ```
-## 82. 删除排序链表中的重复元素 II
+## 202. 快乐数
 
-![](82.png)
+![](202.png)
+
+```c++
+class Solution {
+public:
+    bool isHappy(int n) {
+        unordered_set<int> got;
+        int m = n; // m是每次用来被拆解的数
+        while(true){
+            int sum = 0;
+            while(m != 0){
+                sum += (m % 10) * (m % 10);
+                m /= 10;
+            }
+            if(sum == 1)
+                return true;
+            else if(got.find(sum)!=got.end())
+                return false;
+            else
+                got.insert(sum);
+            m = sum;
+        }
+    }
+};
+```
+## 203. 移除链表元素
+
+![](203.png)
 
 ```c++
 /**
@@ -35,25 +62,74 @@ public:
  */
 class Solution {
 public:
-    ListNode* deleteDuplicates(ListNode* head) {
-        ListNode* dummy = new ListNode(0);
+    ListNode* removeElements(ListNode* head, int val) {
+        ListNode *dummy = new ListNode(-1);
         dummy->next = head;
-        ListNode* p = dummy;
-        while (p->next)
+        for (ListNode *p = dummy; p;)
         {
-            ListNode* q = p->next;
-            while (q && q->val == p->next->val)
-                q = q->next;
-            if (p->next->next == q) p = p->next;
-            else p->next = q;
+            if (p->next && p->next->val == val)
+                p->next = p->next->next;
+            else
+                p = p->next;
         }
         return dummy->next;
     }
 };
 ```
-## 83. 删除排序链表中的重复元素
+## 204. 计数质数
 
-![](83.png)
+![](204.png)
+
+```c++
+class Solution {
+public:
+    int countPrimes(int n) {
+        vector<int> primes;
+        vector<bool> st(n + 1);
+        for (int i = 2; i < n; i ++ )
+        {
+            if (!st[i]) primes.push_back(i);
+            for (int j = 0; i * primes[j] < n; j ++ )
+            {
+                st[i * primes[j]] = true;
+                if (i % primes[j] == 0) break;
+            }
+        }
+        return primes.size();
+    }
+};
+```
+## 205. 同构字符串
+
+![](205.png)
+
+```c++
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        unordered_map<char, char> st, ts;
+        if (s.size() != t.size()) return false;
+        for (int i = 0; i < s.size(); i ++ )
+        {
+            if (st.count(s[i]))
+            {
+                if (st[s[i]] != t[i]) return false;
+            }
+            else st[s[i]] = t[i];
+
+            if (ts.count(t[i]))
+            {
+                if (ts[t[i]] != s[i]) return false;
+            }
+            else ts[t[i]] = s[i];
+        }
+        return true;
+    }
+};
+```
+## 206. 反转链表
+
+![](206.png)
 
 ```c++
 /**
@@ -66,615 +142,532 @@ public:
  */
 class Solution {
 public:
-    ListNode* deleteDuplicates(ListNode* head) {
+    ListNode* reverseList(ListNode* head) {
         if(!head) return NULL;
-        ListNode *first,*second;
-        first = second = head;
-        while(first)
-        {
-            if(first->val != second->val)
-            {
-                second->next = first;
-                second = first;
-            }
-            first = first->next;
-        }
-        second->next = NULL;
-        return head;
+        if(!head->next) return head;
+        ListNode *p = reverseList(head->next);
+        head->next->next = head;
+        head->next = NULL;
+        return p;
     }
 };
 ```
-## 84. 柱状图中最大的矩形
+## 207. 课程表
 
-![](84.png)
+![](207.png)
 
 ```c++
 class Solution {
 public:
-    int largestRectangleArea(vector<int>& heights) {
-        int n = heights.size();
-        vector<int> left(n),rihgt(n);//左右边界
-
-        stack<int> stk;
-        //左边
-        for(int i = 0;i < n;i ++)
-        {
-            while(stk.size() && heights[stk.top()] >= heights[i]) stk.pop();
-            if(stk.empty()) left[i] = -1;
-            else left[i] = stk.top();
-            stk.push(i);
-        }
-        while(stk.size()) stk.pop();
-        //右边
-        for(int i = n - 1;i >= 0;i --)
-        {
-            while(stk.size() && heights[stk.top()] >= heights[i]) stk.pop();
-            if(stk.empty()) rihgt[i] = n;
-            else rihgt[i] = stk.top();
-            stk.push(i);
+    bool canFinish(int numCourses, vector<pair<int, int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses);
+        vector<int> in_degree(numCourses, 0);
+        for (int i = 0; i < prerequisites.size(); i++) {
+            in_degree[prerequisites[i].first]++;
+            graph[prerequisites[i].second].push_back(prerequisites[i].first);
         }
 
-        int res = 0;
-        //枚举每个边界，取最大值
-        for(int i = 0;i < n;i ++) res = max(res,heights[i] * (rihgt[i] - left[i] - 1));
-        return res;
+        queue<int> q;
+        vector<bool> vis(numCourses, false);
+
+        for (int i = 0; i < numCourses; i++)
+            if (in_degree[i] == 0)
+                q.push(i);
+        while (!q.empty()) {
+            int sta = q.front();
+            q.pop();
+            vis[sta] = true;
+            for (int i = 0; i < graph[sta].size(); i++) {
+                in_degree[graph[sta][i]]--;
+                if (in_degree[graph[sta][i]] == 0)
+                    q.push(graph[sta][i]);
+            }
+        }
+
+        for (int i = 0; i < numCourses; i++)
+            if (vis[i] == false)
+                return false;
+        return true;
     }
 };
 ```
-## 85. 最大矩形
+## 208. 实现 Trie (前缀树)
 
-![](85.png)
+![](208.png)
+
+```c++
+class Trie {
+public:
+    struct Node
+    {
+        bool is_end;
+        Node *son[26];
+        Node()
+        {
+            is_end = false;
+            for(int i = 0;i < 26;i ++) son[i] = NULL;
+        }
+    }*root;
+    /** Initialize your data structure here. */
+    Trie() {
+        root = new Node();
+    }
+    
+    /** Inserts a word into the trie. */
+    void insert(string word) {
+        auto p = root;
+        for(auto c : word)
+        {
+            int u = c - 'a';
+            if(p->son[u] == NULL) p->son[u] = new Node();
+            p = p->son[u];
+        }
+        p->is_end = true;
+    }
+    
+    /** Returns if the word is in the trie. */
+    bool search(string word) {
+        auto p = root;
+        for(auto c : word)
+        {
+            int u = c - 'a';
+            if(p->son[u] == NULL) return false;
+            p = p->son[u];
+        }
+        return p->is_end;
+    }
+    
+    /** Returns if there is any word in the trie that starts with the given prefix. */
+    bool startsWith(string prefix) {
+        auto p = root;
+        for(auto c : prefix)
+        {
+            int u = c - 'a';
+            if(p->son[u] == NULL) return false;
+            p = p->son[u];
+        }
+        return true;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+```
+## 209. 长度最小的子数组
+
+![](209.png)
 
 ```c++
 class Solution {
 public:
-    int maximalRectangle(vector<vector<char>>& matrix) {
-        int n = matrix.size(), m, ans = 0;
-        if (n == 0)
-            return 0;
-        m = matrix[0].size();
-        vector<int> heights(m + 1, 0);
-        heights[m] = -1;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++)
-                if (matrix[i][j] == '0')
-                    heights[j] = 0;
-                else
-                    heights[j]++;
-
-            stack<int> st;
-            for (int j = 0; j <= m; j++) {
-                while (!st.empty() && heights[j] < heights[st.top()]) {
-                    int cur = st.top();
-                    st.pop();
-                    if (st.empty())
-                        ans = max(ans, heights[cur] * j);
-                    else
-                        ans = max(ans, heights[cur] * (j - st.top() - 1));
-                }
-                st.push(j);
+    int minSubArrayLen(int s, vector<int>& nums) {
+        int n = nums.size();
+        int start = 0, end = 0, tot = 0, ans = n + 1;
+        while (end < n) {
+            tot += nums[end];
+            while (tot >= s) {
+                ans = min(ans, end - start + 1);
+                tot -= nums[start];
+                start++;
             }
+            end++;
         }
+        if (ans == n + 1)
+            ans = 0;
         return ans;
     }
 };
 ```
-## 86. 分隔链表
+## 210. 课程表 II
 
-![](86.png)
+![](210.png)
 
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
 class Solution {
 public:
-    ListNode* partition(ListNode* head, int x) {
-        ListNode *before = new ListNode(0);
-        ListNode *after = new ListNode(0);
-        ListNode *pb = before, *pa = after;
+    vector<int> findOrder(int numCourses, vector<pair<int, int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses);
+        vector<int> in_degree(numCourses, 0);
+        for (int i = 0; i < prerequisites.size(); i++) {
+            in_degree[prerequisites[i].first]++;
+            graph[prerequisites[i].second].push_back(prerequisites[i].first);
+        }
 
-        for (ListNode *p = head; p; p = p->next)
-            if (p->val < x)
-            {
-                pb->next = p;
-                pb = p;
+        queue<int> q;
+        vector<bool> vis(numCourses, false);
+        vector<int> ans;
+
+        for (int i = 0; i < numCourses; i++)
+            if (in_degree[i] == 0)
+                q.push(i);
+        while (!q.empty()) {
+            int sta = q.front();
+            q.pop();
+            ans.push_back(sta);
+            vis[sta] = true;
+            for (int i = 0; i < graph[sta].size(); i++) {
+                in_degree[graph[sta][i]]--;
+                if (in_degree[graph[sta][i]] == 0)
+                    q.push(graph[sta][i]);
             }
-            else
-            {
-                pa->next = p;
-                pa = p;
-            }
+        }
 
-        pb->next = after->next;
-        pa->next = 0;
-
-        return before->next;
+        for (int i = 0; i < numCourses; i++)
+            if (vis[i] == false)
+                return vector<int>{};
+        return ans;
     }
 };
 ```
-## 87. 扰乱字符串
+## 211. 添加与搜索单词 - 数据结构设计
 
-![](87.png)
-
-![](87-1.png)
+![](211.png)
 
 ```c++
-class Solution {
+class WordDictionary {
 public:
-    bool isScramble(string s1, string s2) {
-        if (s1 == s2) return true;
-        string ss1 = s1, ss2 = s2;
-        sort(ss1.begin(), ss1.end()), sort(ss2.begin(), ss2.end());
-        if (ss1 != ss2) return false;
-        for (int i = 1; i < s1.size(); i ++ )
+    struct Node
+    {
+        bool is_end;
+        Node *next[26];
+        Node()
         {
-            if (isScramble(s1.substr(0, i), s2.substr(0, i))
-                    && isScramble(s1.substr(i), s2.substr(i)))
-                return true;
-            if (isScramble(s1.substr(0, i), s2.substr(s2.size() - i))
-                    && isScramble(s1.substr(i), s2.substr(0, s2.size() - i)))
-                return true;
+            is_end = false;
+            for (int i = 0; i < 26; i ++ )
+                next[i] = 0;
+        }
+    };
+
+    Node *root;
+
+    /** Initialize your data structure here. */
+    WordDictionary() {
+        root = new Node();
+    }
+
+    /** Adds a word into the data structure. */
+    void addWord(string word) {
+        Node *p = root;
+        for (char c : word)
+        {
+            int son = c - 'a';
+            if (!p->next[son]) p->next[son] = new Node();
+            p = p->next[son];
+        }
+        p->is_end = true;
+    }
+
+    /** Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. */
+    bool search(string word) {
+        return dfs(word, 0, root);
+    }
+
+    bool dfs(string &word, int k, Node *u)
+    {
+        if (k == word.size()) return u->is_end;
+        if (word[k] != '.')
+        {
+            if (u->next[word[k] - 'a']) return dfs(word, k + 1, u->next[word[k] - 'a']);
+        }
+        else
+        {
+            for (int i = 0; i < 26; i ++ )
+                if (u->next[i])
+                {
+                    if (dfs(word, k + 1, u->next[i])) return true;
+                }
         }
         return false;
     }
 };
-```
-## 88. 合并两个有序数组
 
-![](88.png)
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary obj = new WordDictionary();
+ * obj.addWord(word);
+ * bool param_2 = obj.search(word);
+ */
+```
+## 212. 单词搜索 II
+
+![](212.png)
 
 ```c++
 class Solution {
 public:
-    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
-        int p = m - 1,q = n - 1,cur = m + n - 1;
-        while(p >= 0 && q >= 0)
+
+    struct Node
+    {
+        int id;
+        Node *next[26];
+        Node()
         {
-            if(nums1[p] >= nums2[q]) nums1[cur --] = nums1[p --];
-            else nums1[cur --] = nums2[q --];
+            id = -1;
+            for (int i = 0; i < 26; i ++ )
+                next[i] = 0;
         }
-        while(p >= 0) nums1[cur --] = nums1[p --];
-        while(q >= 0) nums1[cur --] = nums2[q --];
+    };
+
+    Node *root;
+
+    void insert(string word, int id) {
+        Node *p = root;
+        for (char c : word)
+        {
+            int son = c - 'a';
+            if (!p->next[son]) p->next[son] = new Node();
+            p = p->next[son];
+        }
+        p->id = id;
+    }
+
+    unordered_set<string> hash;
+    vector<string> ans;
+    vector<vector<bool>> st;
+    vector<string> _words;
+    int n, m;
+
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        if (board.empty()) return ans;
+        _words = words;
+        root = new Node();
+        for (int i = 0; i < words.size(); i ++ ) insert(words[i], i);
+        n = board.size(), m = board[0].size();
+        st = vector<vector<bool>>(n, vector<bool>(m, false));
+        for (int i = 0; i < n; i ++ )
+            for (int j = 0; j < m; j ++ )
+                dfs(board, i, j, root->next[board[i][j]-'a']);
+        return ans;
+    }
+
+    void dfs(vector<vector<char>>& board, int x, int y, Node *u)
+    {
+        if (!u) return;
+        st[x][y] = true;
+        if (u->id != -1)
+        {
+            string match = _words[u->id];
+            if (!hash.count(match))
+            {
+                hash.insert(match);
+                ans.push_back(match);
+            }
+        }
+        int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, 1, 0, -1};
+        for (int i = 0; i < 4; i ++ )
+        {
+            int a = x + dx[i], b = y + dy[i];
+            if (a >= 0 && a < n && b >= 0 && b < m && !st[a][b])
+            {
+                char c = board[a][b];
+                dfs(board, a, b, u->next[c-'a']);
+            }
+        }
+        st[x][y] = false;
     }
 };
 ```
-## 89. 格雷编码
+## 213. 打家劫舍 II
 
-![](89.png)
+![](213.png)
 
 ```c++
 class Solution {
 public:
-    vector<int> grayCode(int n) {
-        vector<int> res;
-        res.push_back(0);
-        int t = 1;
-        while (n -- )
-        {
-            vector<int> newRes;
-            for (int i = 0; i < res.size(); i ++ )
-                newRes.push_back(res[i]);
-            for (int i = res.size() - 1; i >= 0; i -- )
-                newRes.push_back(t + res[i]);
-            res = newRes;
-            t *= 2;
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 0) return 0;
+        if (n == 1) return nums[0];
+        if (n == 2) return max(nums[0], nums[1]);
+
+        int ans = 0, f, g;
+        // choose the first one
+        f = nums[2]; g = 0;
+        for (int i = 3; i < n; i++) {
+            int last_f = f, last_g = g;
+            f = last_g + nums[i];
+            g = max(last_f, last_g);
         }
-        return res;
+        ans = g + nums[0];
+
+        // not choose the first one
+        f = nums[1]; g = 0;
+        for (int i = 2; i < n; i++) {
+            int last_f = f, last_g = g;
+            f = last_g + nums[i];
+            g = max(last_f, last_g);
+        }
+        ans = max(ans, max(f, g));
+        return ans;
     }
 };
 ```
-## 90. 子集 II
+## 214. 最短回文串
 
-![](90.png)
+![](214.png)
+
+```c++
+class Solution {
+public:
+    string shortestPalindrome(string s) {
+        int n = s.length();
+        if (n == 0)
+            return "";
+        string t(s.rbegin(), s.rend());
+        vector<int> nxt(n);
+        nxt[0] = -1;
+        int j = -1;
+        for (int i = 1; i < n; i++) {
+            while (j > -1 && s[i] != s[j + 1]) j = nxt[j];
+            if (s[i] == s[j + 1])
+                j++;
+            nxt[i] = j;
+        }
+
+        j = -1;
+        for (int i = 0; i < n; i++) {
+            while (j > -1 && t[i] != s[j + 1]) j = nxt[j];
+            if (t[i] == s[j + 1])
+                j++;
+        }
+        return t + s.substr(j + 1, n - j - 1);
+    }
+};
+```
+## 215. 数组中的第K个最大元素
+
+![](215.png)
+
+```c++
+class Solution {
+public:
+    int solve(int l, int r, vector<int>& nums, int k) {
+        if (l == r)
+            return nums[l];
+        int pivot = nums[l], i = l, j = r;
+        while (i < j) {
+            while (i < j && nums[j] < pivot) j--;
+            if (i < j)
+                nums[i++] = nums[j];
+
+            while (i < j && nums[i] >= pivot) i++;
+            if (i < j)
+                nums[j--] = nums[i];
+        }
+        if (i + 1 == k)
+            return pivot;
+        else if (i + 1 > k)
+            return solve(l, i - 1, nums, k);
+        else
+            return solve(i + 1, r, nums, k);
+
+    }
+    int findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size();
+        return solve(0, n - 1, nums, k);
+    }
+};
+```
+## 216. 组合总和 III
+
+![](216.png)
 
 ```c++
 class Solution {
 public:
     vector<vector<int>> ans;
     vector<int> path;
-
-    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
-        sort(nums.begin(),nums.end());
-        dfs(nums,0);
+    vector<vector<int>> combinationSum3(int k, int n) {
+        dfs(k,1,n);
         return ans;
     }
 
-    void dfs(vector<int> &nums,int u)
+    void dfs(int k,int start,int n)
     {
-        if(u == nums.size())
+        if(!k)
         {
-            ans.push_back(path);
+            if(!n) ans.push_back(path);
             return;
         }
 
-        int k = 0;
-        while(u + k < nums.size() && nums[u + k] == nums[u]) k ++;
-
-        for(int i = 0; i <= k;i ++)
+        for(int i = start;i <= 9;i ++)
         {
-            dfs(nums,u + k);
-            path.push_back(nums[u]);
+            path.push_back(i);
+            dfs(k - 1,i + 1,n - i);
+            path.pop_back();
         }
-
-        for(int i = 0;i <= k;i ++)path.pop_back();
-
     }
 };
 ```
-## 91. 解码方法
+## 217. 存在重复元素
 
-![](91.png)
+![](217.png)
 
 ```c++
 class Solution {
 public:
-    int numDecodings(string s) {
-        int n = s.size();
-        vector<int> f(n + 1);
-        f[0] = 1;
-        for(int i = 1;i <= n;i ++)
-        {
-            if(s[i - 1] != '0') f[i] += f[i - 1];
-            if(i >= 2)
-            {
-                int t = (s[i - 2] - '0') * 10 + s[i - 1] - '0';
-                if(t >= 10 && t <= 26) f[i] += f[i - 2];
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> hash;
+        for (int i = 0; i < nums.size(); i++) {
+            if (hash.find(nums[i]) != hash.end())
+                return true;
+            hash.insert(nums[i]);
+        }
+
+        return false;
+    }
+};
+```
+## 218. 天际线问题
+
+![](218.png)
+
+## 219. 存在重复元素 II
+
+![](219.png)
+
+```c++
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_map<int, int> hash;
+        for (int i = 0; i < nums.size(); i++) {
+            if (hash.find(nums[i]) != hash.end()) {
+                if (i - hash[nums[i]] <= k)
+                    return true;
             }
+            hash[nums[i]] = i;
         }
-        return f[n];
+
+        return false;
     }
 };
 ```
-## 92. 反转链表 II
+## 220. 存在重复元素 III
 
-![](92.png)
+![](220.png)
 
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
+#define LL long long
 class Solution {
 public:
-    ListNode* reverseBetween(ListNode* head, int m, int n) {
-        if(m == n) return head;
-        ListNode *dummy = new ListNode(-1);
-        dummy->next = head;
-        ListNode *b = dummy;
-        for(int i = 0;i < m - 1;i ++) b = b->next;
-        ListNode *a = b;
-        b = b->next;
-        ListNode *c = b->next;
-        for(int i = 0;i < n - m;i ++)
-        {
-            ListNode *t = c->next;
-            c->next = b;
-            b = c,c = t;
+    bool containsNearbyAlmostDuplicate(vector<int>& nums, int k, int t) {
+        multiset<LL> hash;
+        multiset<LL>::iterator it;
+        for (int i = 0; i < nums.size(); i++) {
+            it = hash.lower_bound((LL)(nums[i]) - t);
+            if (it != hash.end() && *it <= (LL)(nums[i]) + t)
+                return true;
+            hash.insert(nums[i]);
+            if (i >= k)
+                hash.erase(hash.find(nums[i - k]));
         }
-        ListNode *mp = a->next;
-        ListNode *np = b;
-        a->next = np,mp->next = c;
-        return dummy->next;
-    }
-};
-```
-## 93. 复原IP地址
-
-![](93.png)
-
-```c++
-class Solution {
-public:
-    vector<string> ans;
-    vector<int> path;
-
-    vector<string> restoreIpAddresses(string s) {
-        dfs(0, 0, s);
-        return ans;
-    }
-
-    // u表示枚举到的字符串下标，k表示当前截断的IP个数，s表示原字符串
-    void dfs(int u, int k, string &s)
-    {
-        if (u == s.size())
-        {
-            if (k == 4)
-            {
-                string ip = to_string(path[0]);
-                for (int i = 1; i < 4; i ++ )
-                    ip += '.' + to_string(path[i]);
-                ans.push_back(ip);
-            }
-            return;
-        }
-        if (k > 4) return;
-
-        unsigned t = 0;
-        for (int i = u; i < s.size(); i ++ )
-        {
-            t = t * 10 + s[i] - '0';
-            if (t >= 0 && t < 256)
-            {
-                path.push_back(t);
-                dfs(i + 1, k + 1, s);
-                path.pop_back();
-            }
-            if (!t) break;
-        }
-    }
-};
-```
-## 94. 二叉树的中序遍历
-
-![](94.png)
-
-```c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    vector<int> inorderTraversal(TreeNode* root) {
-        vector<int> res;
-        stack<TreeNode*> stk;
-
-        auto p = root;
-        while(p || stk.size())
-        {
-            while(p)
-            {
-                stk.push(p);
-                p = p->left;
-            }
-
-            p = stk.top();
-            stk.pop();
-
-            res.push_back(p->val);
-            p = p->right;
-        }
-
-        return res;
-    }
-};
-```
-## 95. 不同的二叉搜索树 II
-
-![](95.png)
-
-```c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    vector<TreeNode*> generateTrees(int n) {
-        if (!n) return vector<TreeNode*>();
-        return dfs(1, n);
-    }
-
-    vector<TreeNode*> dfs(int l, int r)
-    {
-        vector<TreeNode*>res;
-        if (l > r)
-        {
-            res.push_back(NULL);
-            return res;
-        }
-        for (int i = l; i <= r; i ++ )
-        {
-            vector<TreeNode*>left = dfs(l, i - 1)
-                , right = dfs(i + 1, r);
-            for (auto &lc : left)
-                for (auto &rc : right)
-                {
-                    TreeNode *root = new TreeNode(i);
-                    root->left = lc;
-                    root->right = rc;
-                    res.push_back(root);
-                }
-        }
-        return res;
-    }
-};
-```
-## 96. 不同的二叉搜索树
-
-![](96.png)
-
-```c++
-class Solution {
-public:
-    int numTrees(int n) {
-        vector<int>f(n + 1);
-        f[0] = 1;
-        for (int i = 1; i <= n; i ++ )
-        {
-            f[i] = 0;
-            for (int j = 1; j <= i; j ++ )
-                f[i] += f[j - 1] * f[i - j];
-        }
-        return f[n];
-    }
-};
-```
-## 97. 交错字符串
-
-![](97.png)
-
-```c++
-class Solution {
-public:
-    bool isInterleave(string s1, string s2, string s3) {
-        int n = s1.size(), m = s2.size(), k = s3.size();
-        if (k != n + m) return false;
-        vector<vector<int>> f = 
-            vector<vector<int>>(n + 1, vector<int>(m + 1));
-        f[0][0] = 1;
-        for (int i = 1; i <= n; i ++ )
-            f[i][0] = f[i - 1][0] && s1[i - 1] == s3[i - 1];
-        for (int i = 1; i <= m; i ++ )
-            f[0][i] = f[0][i - 1] && s2[i - 1] == s3[i - 1];
-        for (int i = 1; i <= n; i ++ )
-            for (int j = 1; j <= m; j ++ )
-            {
-                f[i][j] = 0;
-                if (s1[i - 1] == s3[i + j - 1])
-                    f[i][j] |= f[i - 1][j];
-                if (s2[j - 1] == s3[i + j - 1])
-                    f[i][j] |= f[i][j - 1];
-            }
-        return f[n][m];
-    }
-};
-```
-## 98. 验证二叉搜索树
-
-![](98.png)
-
-```c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    bool isValidBST(TreeNode* root) {
-        return dfs(root,INT_MIN,INT_MAX);
-    }
-    bool dfs(TreeNode *root,long long minv,long long maxv)
-    {
-        if(!root) return true;
-        if(root->val < minv || root->val > maxv) return false;
-
-        return dfs(root->left,minv,root->val - 1ll) && dfs(root->right,root->val + 1ll,maxv);
-    }
-};
-```
-## 99. 恢复二叉搜索树
-
-![](99.png)
-
-```c++
-/*
-这道题目如果用递归做，递归的层数最坏是 O(n)O(n) 级别的，所以系统栈的空间复杂度是 O(n)O(n)，与题目要求的 O(1)O(1) 额外空间不符。
-同理用栈模拟递归的迭代方式的空间复杂度也是 O(n)O(n)，不符合题目要求。
-
-这道题目可以用Morris-traversal算法，该算法可以用额外 O(1)O(1) 的空间，以及 O(n)O(n) 的时间复杂度，中序遍历一棵二叉树。
-
-Morris-traversal 算法流程：
-下图给了一个具体示例：
-```
-![](99-1.jpg)
-```c++
-/*从根节点开始遍历，直至当前节点为空为止：
-
-如果当前节点没有左儿子，则打印当前节点的值，然后进入右子树；
-如果当前节点有左儿子，则找当前节点的前驱。
-(1) 如果前驱节点的右儿子为空，说明左子树没遍历过，则进入左子树遍历，并将前驱节点的右儿子置成当前节点，方便回溯；
-(2) 如果前驱节点的右儿子为当前节点，说明左子树已被遍历过，则将前驱节点的右儿子恢复为空，然后打印当前节点的值，然后进入右子树继续遍历；
-中序遍历的结果就是二叉树搜索树所表示的有序数列。有序数列从小到大排序，但有两个数被交换了位置。共有两种情况：
-
-交换的是相邻两个数，例如 1 3 2 4 5 6，则第一个逆序对，就是被交换的两个数，这里是3和2；
-交换的是不相邻的数，例如 1 5 3 4 2 6，则第一个逆序对的第一个数，和第二个逆序对的第二个数，就是被交换的两个数，这里是5和2；
-找到被交换的数后，我们将它们换回来即可。
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    void recoverTree(TreeNode* root) {
-        TreeNode *first = NULL, *second, *prep = NULL;
-        while (root)
-        {
-            if (!root->left)
-            {
-                if (prep && prep->val > root->val)
-                {
-                    if (!first) first = prep, second = root;
-                    else second = root;
-                }
-                prep = root;
-                root = root->right;
-            }
-            else
-            {
-                TreeNode *p = root->left;
-                while (p->right && p->right != root) p = p->right;
-                if (!p->right)
-                {
-                    p->right = root;
-                    root = root->left;
-                }
-                else
-                {
-                    p->right = NULL;
-                    if (prep && prep->val > root->val)
-                    {
-                        if (!first) first = prep, second = root;
-                        else second = root;
-                    }
-                    prep = root;
-                    root = root->right;
-                }
-            }
-        }
-        swap(first->val, second->val);
-    }
-};
-```
-## 100. 相同的树
-
-![](100.png)
-
-```c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    bool isSameTree(TreeNode* p, TreeNode* q) {
-        if(!p || !q) return !p && !q;
-        return p->val == q->val && isSameTree(p->left,q->left) && isSameTree(p->right,q->right);
+        return false;
     }
 };
 ```
