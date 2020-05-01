@@ -4,6 +4,8 @@
 ------------------------------------------------------------------------------------------------------------------------------------
 
 # LeetCode
+
+
 ## *LeetCode分类刷(一刷)*
 
 ### [LeetCode基本数据结构](LeetCode_1/LeetCode基本数据结构.md) 
@@ -14,6 +16,8 @@
 ### [LeetCode滑动窗口，双指针，单调队列、栈](LeetCode_1/LeetCode滑动窗口，双指针，单调队列、栈.md) 
 ### [LeetCode回溯和DFS专项](LeetCode_1/LeetCode回溯和DFS专项.md) 
 ### [LeetCode动态规划](LeetCode_1/LeetCode动态规划.md) 
+
+
 
 ## *LeetCode顺序刷(二刷)*
 
@@ -33,6 +37,8 @@
 ### [LeetCode(281-300)](LeetCode_2/LeetCode(281-300).md) 
 ### [LeetCode(301-320)](LeetCode_2/LeetCode(301-320).md) 
 
+
+
 ## *LeetCode周赛*
 
 ### [LeetCode第177场周赛](LeetCode周赛/LeetCode第177场周赛.md) 
@@ -41,3 +47,26 @@
 ### [LeetCode第180场周赛](LeetCode周赛/LeetCode第180场周赛.md) 
 ### [LeetCode第181场周赛](LeetCode周赛/LeetCode第181场周赛.md) 
 ### [LeetCode第182场周赛](LeetCode周赛/LeetCode第182场周赛.md) 
+
+
+
+# PAT
+## *PAT乙级*
+
+### [PAT乙级(1-20)](PAT/PAT乙级(1-20).md) 
+### [PAT乙级(21-40)](PAT/PAT乙级(21-40).md) 
+### [PAT乙级(41-60)](PAT/PAT乙级(41-60).md) 
+### [PAT乙级(61-80)](PAT/PAT乙级(61-80).md) 
+### [PAT乙级(81-95)](PAT/PAT乙级(81-95).md) 
+
+## *PAT甲级* 
+### [PAT甲级](PAT甲级.md) 
+
+
+# Mice
+
+
+
+### [PayPal笔试题2019](PayPal笔试题2019.md) 
+### [腾讯2019 暑期实习提前批笔试](腾讯2019 暑期实习提前批笔试.md) 
+### [剑指Offer](剑指Offer/剑指Offer.md) 
