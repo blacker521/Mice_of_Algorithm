@@ -151,12 +151,14 @@ public:
 class Solution {
 public:
     int reverse(int x) {
-        string s = to_string(x); 
-        int n = s.size();
-        long long t;
-        for(int i = 0; i < n / 2; i++) swap(s[i],s[n - i -1]);
-        t = stoi(s);
-        return x < 0 ? -t : t;
+        long long res = 0;
+        while(x)
+        {
+            res = res * 10 + x % 10;
+            x /= 10;
+        }
+        if (res < INT_MIN || res > INT_MAX) return 0;
+        return res;
     }
 };
 ```
@@ -168,22 +170,25 @@ public:
 class Solution {
 public:
     int myAtoi(string str) {
-        int ans = 0,i = 0,flag = 1;
-        while(str[i] == ' ') i++;
-        if(str[i] == '-'){
-            flag = -1;
+        long long res = 0;
+        int k = 0;
+        while(k < str.size() && (str[k] == ' ' || str[k] == '\t')) k ++ ;
+        int minus = 1;
+        if (k >= str.size()) return 0;
+        if (str[k] == '-') minus = -1, k ++;
+        if (str[k] == '+')
+            if (minus == -1) return 0;
+            else k ++ ;
+        while(str[k] >= '0' && str[k] <= '9')
+        {
+            res = res * 10 + str[k] - '0';
+            k ++ ;
+            if (res > INT_MAX) break;
         }
-        if(str[i] == '+' || str[i] == '-') i++;
-        while(i < str.size() && isdigit(str[i])){
-            int r = str[i] - '0'; 
-            if(ans > INT_MAX / 10 || (ans == INT_MAX / 10 && r > 7)){
-                return flag > 0 ? INT_MAX : INT_MIN;
-            }
-            ans = ans * 10 + r;
-            i++;
-        }
-        return flag > 0 ? ans : -ans;
-        
+        res *= minus;
+        if (res > INT_MAX) return INT_MAX;
+        if (res < INT_MIN) return INT_MIN;
+        return res;
     }
 };
 ```
@@ -193,25 +198,19 @@ public:
 
 ```c++
 class Solution {
- public:
-     bool isPalindrome(int x) {
-         string str = to_string(x);
-         int mid = (str.length() % 2 == 1) ? (str.length()/2) :(str.length()/2-1);
-         if(str.length() % 2 == 1)
-         {
-             for(int i = 1;i + mid < str.length(); i ++){
-                 if(str[mid + i] != str[mid - i])return false;
-             }
-             return true;
-         }
-         else{
-             for(int i = 1;i + mid < str.length();i ++){
-                 if(str[mid + i] != str[mid - i + 1])return false;
-             }
-             return true;
-         }
-     }
- };
+public:
+    bool isPalindrome(int x) {
+        if (x < 0 || x && x % 10 == 0) return false;
+        int s = 0;
+        while (s <= x)
+        {
+            s = s * 10 + x % 10;
+            if (s == x || s == x / 10) return true; // 分别处理整数长度是奇数或者偶数的情况
+            x /= 10;
+        }
+        return false;
+    }
+};
 ```
 ## 10. 正则表达式匹配
 
