@@ -4,13 +4,13 @@ typora-root-url: img
 
 ## 1. 两数之和
 
-![](1.png)
+![](/1.png)
 
 ```c++
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int,int> hash;
+        unordered_map<int,int> hash; 
         for(int i = 0;i < nums.size();i ++)
         {
             if(hash.count(target - nums[i])) return {hash[target -nums[i]],i};
@@ -22,35 +22,28 @@ public:
 ```
 ## 2. 两数相加
 
-![](2.png)
+![](/2.png)
 
 ```c++
 class Solution {
 public:
-    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) 
-    {
-        ListNode *res = new ListNode(-1);   //添加虚拟头结点，简化边界情况的判断
-        ListNode *cur = res;
-        int carry = 0;  //表示进位
-        while (l1 || l2) 
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        auto dummy = new ListNode(-1),cur = dummy;
+        int t = 0;
+        while(l1 || l2 || t)
         {
-            int n1 = l1 ? l1->val : 0;
-            int n2 = l2 ? l2->val : 0;
-            int sum = n1 + n2 + carry;
-            carry = sum / 10;
-            cur->next = new ListNode(sum % 10);
-            cur = cur->next;
-            if (l1) l1 = l1->next;
-            if (l2) l2 = l2->next;
+            if(l1) t += l1->val,l1 = l1->next;
+            if(l2) t += l2->val,l2 = l2->next;
+            cur = cur->next = new ListNode(t % 10);
+            t /= 10;
         }
-        if (carry) cur->next = new ListNode(1); //如果最高位有进位，则需在最前面补1.
-        return res->next;   //返回真正的头结点
+        return dummy->next;
     }
 };
 ```
 ## 3. 无重复字符的最长子串
 
-![](3.png)
+![](/3.png)
 
 ```c++
 class Solution {
@@ -70,7 +63,7 @@ public:
 ```
 ## 4. 寻找两个有序数组的中位数
 
-![](4.png)
+![](/4.png)
 
 ```c++
 class Solution {
@@ -97,10 +90,42 @@ public:
         return -1;
     }
 };
+/*递归
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int tot = nums1.size() + nums2.size();
+        if(tot % 2 == 0)
+        {
+            int left = find(nums1,0,nums2,0,tot / 2);
+            int right = find(nums1,0,nums2,0,tot / 2 + 1);
+            return (left + right) / 2.0;
+        }
+        else 
+        {
+            return find(nums1,0,nums2,0,tot / 2 + 1);
+        }
+    }
+    int find(vector<int> &nums1,int i,vector<int> &nums2,int j,int k)
+    {
+        if(nums1.size() - i  > nums2.size() - j) return find(nums2,j,nums1,i,k);
+        if(k == 1)
+        {
+            if(nums1.size() == i) return nums2[j];
+            else return min(nums1[i],nums2[j]);
+        }
+        if(nums1.size() == i) return nums2[j + k - 1];
+        int si = min((int)nums1.size(),i + k / 2),sj = j + k - k / 2;
+        if(nums1[si - 1] > nums2[sj - 1])
+            return find(nums1,i,nums2,sj,k - (sj - j));
+        else
+            return find(nums1,si,nums2,j,k - (si - i));
+    }
+};*/
 ```
 ## 5. 最长回文子串
 
-![](5.png)
+![](/5.png)
 
 ```c++
 class Solution {
