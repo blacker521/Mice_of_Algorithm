@@ -2,230 +2,9 @@
 typora-root-url: img
 ---
 
-## 1. 两数之和
-
-![](1.png)
-
-```c++
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int,int> hash;
-        for(int i = 0;i < nums.size();i ++)
-        {
-            if(hash.count(target - nums[i])) return {hash[target -nums[i]],i};
-            hash[nums[i]] = i;
-        }
-        return {-1,-1};
-    }
-};
-```
-## 2. 两数相加
-
-![](2.png)
-
-```c++
-class Solution {
-public:
-    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) 
-    {
-        ListNode *res = new ListNode(-1);   //添加虚拟头结点，简化边界情况的判断
-        ListNode *cur = res;
-        int carry = 0;  //表示进位
-        while (l1 || l2) 
-        {
-            int n1 = l1 ? l1->val : 0;
-            int n2 = l2 ? l2->val : 0;
-            int sum = n1 + n2 + carry;
-            carry = sum / 10;
-            cur->next = new ListNode(sum % 10);
-            cur = cur->next;
-            if (l1) l1 = l1->next;
-            if (l2) l2 = l2->next;
-        }
-        if (carry) cur->next = new ListNode(1); //如果最高位有进位，则需在最前面补1.
-        return res->next;   //返回真正的头结点
-    }
-};
-```
-## 3. 无重复字符的最长子串
-
-![](3.png)
-
-```c++
-class Solution {
-public:
-    int lengthOfLongestSubstring(string s) {
-        unordered_map<char,int> hash;
-        int res = 0;
-        for(int i = 0,j = 0;j < s.size();j ++)
-        {
-            hash[s[j]] ++;
-            while(hash[s[j]] > 1) hash[s[i ++]] --;
-            res = max(res,j - i + 1);
-        }
-        return res;
-    }
-};
-```
-## 4. 寻找两个有序数组的中位数
-
-![](4.png)
-
-```c++
-class Solution {
-public:
-    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-        int N1 = nums1.size();
-        int N2 = nums2.size();
-        if (N1 < N2) return findMedianSortedArrays(nums2, nums1);
-
-        int lo = 0, hi = N2 * 2;
-        while (lo <= hi) {
-            int mid2 = (lo + hi) / 2;
-            int mid1 = N1 + N2 - mid2;
-
-            double L1 = (mid1 == 0) ? INT_MIN : nums1[(mid1-1)/2];
-            double L2 = (mid2 == 0) ? INT_MIN : nums2[(mid2-1)/2];
-            double R1 = (mid1 == N1 * 2) ? INT_MAX : nums1[(mid1)/2];
-            double R2 = (mid2 == N2 * 2) ? INT_MAX : nums2[(mid2)/2];
-
-            if (L1 > R2) lo = mid2 + 1;
-            else if (L2 > R1) hi = mid2 - 1;
-            else return (max(L1,L2) + min(R1, R2)) / 2;
-        }
-        return -1;
-    }
-};
-```
-## 5. 最长回文子串
-
-![](5.png)
-
-```c++
-class Solution {
-public:
-    string longestPalindrome(string s) {
-        string res;
-        for(int i = 0;i < s.size();i ++)
-        {
-            for(int j = i,k = i;j >= 0 && k < s.size() && s[k] == s[j];j --,k ++)
-                if(res.size() < k - j + 1)
-                    res = s.substr(j,k - j + 1);
-            
-            for(int j = i,k = i + 1;j >= 0 && k < s.size() && s[k] == s[j];j --,k ++)
-                if(res.size() < k - j + 1)
-                    res = s.substr(j,k - j + 1);
-        }
-        return res;
-    }
-};
-```
-## 6. Z 字形变换
-
-![](6.png)
-
-```c++
-class Solution {
-public:
-    string convert(string s, int n) {
-        if(n == 1) return s;
-        string res;
-        for(int i = 0;i < n;i ++)
-        {
-            if(!i || i == n -1)
-            {
-                for(int j = i;j < s.size();j += 2 * (n - 1)) res += s[j];
-            }
-            else
-            {
-                for(int j = i,k = 2 * (n - 1) - i;j < s.size() || k < s.size();j += 2 *(n - 1),k += 2 * (n - 1))
-                {
-                    if(j < s.size()) res += s[j];
-                    if(k < s.size()) res += s[k];
-                }
-            }
-        }
-        return res;
-    }
-};
-```
-## 7. 整数反转
-
-![](7.png)
-
-```c++
-class Solution {
-public:
-    int reverse(int x) {
-        long long res = 0;
-        while(x)
-        {
-            res = res * 10 + x % 10;
-            x /= 10;
-        }
-        if (res < INT_MIN || res > INT_MAX) return 0;
-        return res;
-    }
-};
-```
-## 8. 字符串转换整数 (atoi)
-
-![](8.png)
-
-```c++
-class Solution {
-public:
-    int myAtoi(string str) {
-        long long res = 0;
-        int k = 0;
-        while(k < str.size() && (str[k] == ' ' || str[k] == '\t')) k ++ ;
-        int minus = 1;
-        if (k >= str.size()) return 0;
-        if (str[k] == '-') minus = -1, k ++;
-        if (str[k] == '+')
-            if (minus == -1) return 0;
-            else k ++ ;
-        while(str[k] >= '0' && str[k] <= '9')
-        {
-            res = res * 10 + str[k] - '0';
-            k ++ ;
-            if (res > INT_MAX) break;
-        }
-        res *= minus;
-        if (res > INT_MAX) return INT_MAX;
-        if (res < INT_MIN) return INT_MIN;
-        return res;
-    }
-};
-```
-## 9. 回文数
-
-![](9.png)
-
-```c++
-class Solution {
-public:
-    bool isPalindrome(int x) {
-        if (x < 0 || x && x % 10 == 0) return false;
-        int s = 0;
-        while (s <= x)
-        {
-            s = s * 10 + x % 10;
-            if (s == x || s == x / 10) return true; // 分别处理整数长度是奇数或者偶数的情况
-            x /= 10;
-        }
-        return false;
-    }
-};
-```
-## 10. 正则表达式匹配
-
-![](10.png)
-
 ## 11. 盛最多水的容器
 
-![](11.png)
+![](/11.png)
 
 ```c++
 class Solution {
@@ -248,7 +27,7 @@ public:
 
 ## 12. 整数转罗马数字
 
-![](12.png)
+![](/12.png)
 
 ```c++
 class Solution {
@@ -270,7 +49,7 @@ public:
 ```
 ## 13. 罗马数字转整数
 
-![](13.png)
+![](/13.png)
 
 ```c++
 class Solution {
@@ -296,7 +75,7 @@ public:
 ```
 ## 14. 最长公共前缀
 
-![](14.png)
+![](/14.png)
 
 ```c++
 class Solution {
@@ -318,10 +97,28 @@ public:
         return res;
     }
 };
+/*
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        string res;
+        if(strs.empty()) return res;
+
+        for(int i = 0;;i ++)
+        {
+            if(i >= strs[0].size()) return res;
+            char c = strs[0][i];
+            for(auto & str : strs)
+                if(str.size() <= i || str[i] != c) return res;
+            res += c;
+        }
+        return res;
+    }
+}; */
 ```
 ## 15. 三数之和
 
-![](15.png)
+![](/15.png)
 
 ```c++
 class Solution {
@@ -353,7 +150,7 @@ public:
 ```
 ## 16. 最接近的三数之和
 
-![](16.png)
+![](/16.png)
 
 ```c++
 class Solution {
@@ -372,7 +169,7 @@ public:
 ```
 ## 17. 电话号码的字母组合
 
-![](17.png)
+![](/17.png)
 
 ```c++
 class Solution {
@@ -394,10 +191,33 @@ public:
         return state;
     }
 };
+/*
+class Solution {
+public:
+    vector<string> ans;
+    string strs[10] = {"","","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+
+    vector<string> letterCombinations(string digits) {
+        if(digits.empty()) return ans;
+        dfs(digits,0,"");
+        return ans;
+    }
+
+    void dfs(string &digits,int u,string path)
+    {
+        if(u == digits.size()) ans.push_back(path);
+        else
+        {
+            for(auto c : strs[digits[u] - '0'])
+                dfs(digits,u + 1,path + c);
+        }
+    }
+};
+*/
 ```
 ## 18. 四数之和
 
-![](18.png)
+![](/18.png)
 
 ```c++
 class Solution {
@@ -434,17 +254,9 @@ public:
 ```
 ## 19. 删除链表的倒数第N个节点
 
-![](19.png)
+![](/19.png)
 
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
@@ -465,7 +277,7 @@ public:
 ```
 ## 20. 有效的括号
 
-![](20.png)
+![](/20.png)
 
 ```c++
 class Solution {

@@ -148,7 +148,7 @@ public:
 ```
 ## 6. Z 字形变换
 
-![](6.png)
+![](/6.png)
 
 ```c++
 class Solution {
@@ -159,17 +159,13 @@ public:
         for(int i = 0;i < n;i ++)
         {
             if(!i || i == n -1)
-            {
                 for(int j = i;j < s.size();j += 2 * (n - 1)) res += s[j];
-            }
             else
-            {
-                for(int j = i,k = 2 * (n - 1) - i;j < s.size() || k < s.size();j += 2 *(n - 1),k += 2 * (n - 1))
+                  for(int j = i,k = 2 * (n - 1) - i;j < s.size() || k < s.size();j += 2 *(n - 1),k += 2 * (n - 1))
                 {
                     if(j < s.size()) res += s[j];
                     if(k < s.size()) res += s[k];
-                }
-            }
+                 }
         }
         return res;
     }
@@ -177,7 +173,7 @@ public:
 ```
 ## 7. 整数反转
 
-![](7.png)
+![](/7.png)
 
 ```c++
 class Solution {
@@ -186,7 +182,7 @@ public:
         long long res = 0;
         while(x)
         {
-            res = res * 10 + x % 10;
+            res = res *  10 + x % 10;
             x /= 10;
         }
         if (res < INT_MIN || res > INT_MAX) return 0;
@@ -196,7 +192,7 @@ public:
 ```
 ## 8. 字符串转换整数 (atoi)
 
-![](8.png)
+![](/8.png)
 
 ```c++
 class Solution {
@@ -226,7 +222,7 @@ public:
 ```
 ## 9. 回文数
 
-![](9.png)
+![](/9.png)
 
 ```c++
 class Solution {
@@ -242,8 +238,52 @@ public:
         }
         return false;
     }
-};
+}
+/*
+class Solution {
+public:
+    bool isPalindrome(int x) {
+     if(x < 0) return 0;
+     int y = x;
+     long long res = 0;
+     while(x)
+     {
+         res = res * 10 + x % 10;
+         x /= 10;
+     }
+     return res == y;
+    }
+};*/
 ```
 ## 10. 正则表达式匹配
 
-![](10.png)
+![](/10.png)
+```c++
+class Solution {
+public:
+    vector<vector<int>>f;
+    int n, m;
+    bool isMatch(string s, string p) {
+        n = s.size();
+        m = p.size();
+        f = vector<vector<int>>(n + 1, vector<int>(m + 1, -1));
+        return dp(0, 0, s, p);
+    }
+
+    bool dp(int x, int y, string &s, string &p)
+    {
+        if (f[x][y] != -1) return f[x][y];
+        if (y == m)
+            return f[x][y] = x == n;
+        bool first_match = x < n && (s[x] == p[y] || p[y] == '.');
+        bool ans;
+        if (y + 1 < m && p[y + 1] == '*')
+        {
+            ans = dp(x, y + 2, s, p) || first_match && dp(x + 1, y, s, p);
+        }
+        else
+            ans = first_match && dp(x + 1, y + 1, s, p);
+        return f[x][y] = ans;
+    }
+};
+```
