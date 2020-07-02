@@ -1,372 +1,12 @@
----
 typora-root-url: img
----
 
-## 21. 合并两个有序链表
-
-![](21.png)
-
-```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
-    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
-        auto dummy = new ListNode(-1);
-        auto p = dummy;
-        while(l1 && l2)
-        {
-            if (l1->val < l2->val)
-            {
-                p->next = l1;
-                p = l1;
-                l1 = l1->next;
-            }
-            else
-            {
-                p->next = l2;
-                p = l2;
-                l2 = l2->next;
-            }
-        }
-        if (!l1) l1 = l2;
-        while(l1)
-        {
-            p->next = l1;
-            p = l1;
-            l1 = l1->next;
-        }
-        return dummy->next;
-    }
-};
-```
-## 22. 括号生成
-
-![](22.png)
-
-```c++
-class Solution {
-public:
-    vector<string> res;
-    void solve(int l ,int r,int n,string cur)
-        {
-            if(l == n && r == n)
-            {
-                res.push_back(cur);
-                return;
-            }
-            if(l < n) solve(l + 1,r,n,cur + "(");
-            if(r < l) solve(l, r + 1, n, cur + ")");
-        }
-    vector<string> generateParenthesis(int n) {
-        if(n == 0) return res;
-        solve(0,0,n,"");
-        return res;
-    }
-};
-```
-## 23. 合并K个排序链表
-
-![](23.png)
-
-```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
-    ListNode* merge2Lists(ListNode* l1, ListNode* l2) {
-        ListNode *head = new ListNode(0);
-        ListNode *cur = head;
-        while (l1 != NULL && l2 != NULL) {
-            if (l1 -> val < l2 -> val) {
-                cur -> next = l1;
-                l1 = l1 -> next;
-            }
-            else {
-                cur -> next = l2;
-                l2 = l2 -> next;
-            }
-            cur = cur -> next;
-        }
-        cur -> next = (l1 != NULL ? l1 : l2);
-        return head -> next;
-    }
-
-    ListNode* mergeKLists(vector<ListNode*>& lists) {
-        if (lists.size() == 0)
-            return NULL;
-        if (lists.size() == 1)
-            return lists[0];
-
-        int mid = lists.size() / 2;
-        vector<ListNode*> left = vector<ListNode*>(lists.begin(), lists.begin() + mid);
-        vector<ListNode*> right = vector<ListNode*>(lists.begin() + mid, lists.end());
-        ListNode *l1 = mergeKLists(left);
-        ListNode *l2 = mergeKLists(right);
-        return merge2Lists(l1, l2);
-    }
-};
-```
-## 24. 两两交换链表中的节点
-
-![](24.png)
-
-```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
-    ListNode* swapPairs(ListNode* head) {
-        ListNode* dummy = new ListNode(0);
-        dummy -> next = head;
-        ListNode* cur = dummy;
-
-        while (cur != NULL) {
-            ListNode* first = cur -> next;
-            if (first == NULL)
-                break;
-
-            ListNode* second = first -> next;
-            if (second == NULL)
-                break;
-
-            // 按照一定的次序，交换相邻的两个结点。
-            cur -> next = second;
-            first -> next = second -> next;
-            second -> next = first;
-
-            cur = first;
-        }
-        return dummy -> next;
-    }
-};
-```
-## 25. K 个一组翻转链表
-
-![](25.png)
-
-```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode(int x) : val(x), next(NULL) {}
- * };
- */
-class Solution {
-public:
-    ListNode* reverseKGroup(ListNode* head, int k) {
-        ListNode* dummy = new ListNode(0);
-        dummy -> next = head;
-        ListNode* cur = dummy;
-
-        while (cur != NULL) {
-            ListNode *first = cur -> next;
-            ListNode *end = cur;
-
-            for (int i = 0; i < k && end != NULL; i++)
-                end = end -> next;
-
-            if (end == NULL)
-                break;
-            //change;
-            ListNode *p1 = first;
-            ListNode *p2 = first -> next;
-            while (p1 != end) {
-                ListNode *new_p2 = p2 -> next;
-                p2 -> next = p1;
-                p1 = p2;
-                p2 = new_p2;
-            }
-
-            first -> next = p2;
-            cur -> next = end;
-            cur = first;
-        }
-        return dummy -> next;
-    }
-};
-```
-## 26. 删除排序数组中的重复项
-
-![](26.png)
-
-```c++
-class Solution {
-public:
-    int removeDuplicates(vector<int>& nums) {
-        if(nums.empty()) return 0;
-        int k = 1;
-        for(int i = 1;i < nums.size();i ++)
-        {
-            if(nums[i] != nums[i - 1])
-                nums[k ++] = nums[i];
-        }
-        return k;
-    }
-};
-```
-## 27. 移除元素
-
-![](27.png)
-
-```c++
-class Solution {
-public:
-    int removeElement(vector<int>& nums, int val) {
-        int k = 0;
-        for(int i =0 ;i < nums.size();i++)
-            if(nums[i] != val)
-                nums[k ++] =  nums[i];
-        
-        return k;
-                
-    }
-};
-```
-## 28. 实现 strStr()
-
-![](28.png)
-
-```c++
-class Solution {
-public:
-    int strStr(string haystack, string needle) {
-        int n = haystack.size(),m = needle.size();
-        for(int i= 0 ;i < n - m + 1;i ++)
-        {
-            bool flag = true;
-            for(int j = 0;j < m;j ++)
-                if(haystack[i + j] != needle[j])
-                {
-                    flag = false;
-                    break;
-                }
-            if(flag) return i;
-        }
-        return -1;
-
-    }
-};
-```
-## 29. 两数相除
-
-![](29.png)
-
-```c++
-class Solution {
-public:
-    int divide(int dividend, int divisor) {
-        const int HALF_INT_MIN = -1073741824;
-        int x = dividend, y = divisor;
-
-        bool sign = (x > 0) ^ (y > 0);
-
-        if (x > 0) x = -x;
-        if (y > 0) y = -y;
-
-        vector<pair<int, int>> ys;
-
-        for (int t1 = y, t2 = -1; t1 >= x; t1 += t1, t2 += t2) {
-            ys.emplace_back(t1, t2);
-            if (t1 < HALF_INT_MIN)
-                break;
-        }
-
-        int ans = 0;
-        for (int i = ys.size() - 1; i >= 0; i--)
-            if (x <= ys[i].first) {
-                x -= ys[i].first;
-                ans += ys[i].second;
-            }
-
-        if (!sign) {
-            if (ans == INT_MIN)
-                return INT_MAX;
-            ans = -ans;
-        }
-
-        return ans;
-    }
-};
-```
-## 30. 串联所有单词的子串
-
-![](30.png)
-
-```c++
-class Solution {
-public:
-    int check(string s, int begin, int n, int len, int tot,
-            unordered_map<string, int>& wc, vector<int>& ans) {
-        // 寻找以begin开始的子串的所有匹配，并返回下一次开始匹配的位置。
-        unordered_map<string, int> vis;
-        int count = 0;
-        for (int i = begin; i < n - len + 1; i += len) {
-            string candidate = s.substr(i, len);
-            if (wc.find(candidate) == wc.end())
-                // 遇到不合法的候选单词，直接返回下一次的开始位置为i+len。
-                return i + len;
-
-            while (vis[candidate] == wc[candidate]) {
-                // 遇到多余的候选单词，不断从begin开始删除候选单词，直到当前候选单词合法。
-                vis[s.substr(begin, len)]--;
-                count--;
-                begin += len;
-            }
-            vis[candidate]++; // 插入候选单词。
-            count++;
-            if (count == tot) // 找到一个位置，记录答案。
-                ans.push_back(begin);
-        }
-        return n;
-    }
-    vector<int> findSubstring(string s, vector<string>& words) {
-        vector<int> ans;
-        int n = s.length();
-        int tot = words.size();
-        if (tot == 0) return ans;
-
-        unordered_map<string, int> wc;
-
-        for(int i = 0; i < tot; i++)
-            wc[words[i]]++;
-        int len = words[0].length();
-
-        for (int offset = 0; offset < len; offset++) // 枚举划分
-            for (int begin = offset; begin < n;
-                begin = check(s, begin, n, len, tot, wc, ans));
-
-        return ans;
-    }
-};
-```
 ## 31. 下一个排列
 
-![](31.png)
+![](/31.png)
 
 ```c++
 class Solution {
-public:
+public: 
     void nextPermutation(vector<int>& nums) {
         int n = nums.size();
         int j = -1;
@@ -383,7 +23,7 @@ public:
                 if(nums[i] > nums[j])
                 {
                     swap(nums[i],nums[j]);
-                    break;
+                    break; 
                 }
             reverse(nums.begin() + j + 1,nums.end());
         }
@@ -392,7 +32,7 @@ public:
 ```
 ## 32. 最长有效括号
 
-![](32.png)
+![](/32.png)
 
 ```c++
 class Solution {
@@ -404,7 +44,7 @@ public:
         for(int i = 0,start = 0,cnt = 0;i <s.size();i ++)
             if(s[i] == '(') cnt ++;
             else
-            {
+            { 
                 cnt --;
                 if(cnt < 0) start  = i + 1,cnt = 0;
                 else if(!cnt) res = max(res,i - start + 1);
@@ -421,7 +61,7 @@ public:
 ```
 ## 33. 搜索旋转排序数组
 
-![](33.png)
+![](/33.png)
 
 ```c++
 class Solution {
