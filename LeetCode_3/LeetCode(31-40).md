@@ -1,4 +1,6 @@
-typora-root-url: img
+---
+typora-root-url: ./img
+---
 
 ## 31. 下一个排列
 
@@ -94,7 +96,7 @@ public:
 ```
 ## 34. 在排序数组中查找元素的第一个和最后一个位置
 
-![](34.png)
+![](/34.png)
 
 ```c++
 class Solution {
@@ -126,7 +128,7 @@ public:
 ```
 ## 35. 搜索插入位置
 
-![](35.png)
+![](/35.png)
 
 ```c++
 class Solution {
@@ -136,7 +138,7 @@ public:
         while(l < r)
         {
             int mid = l + r >> 1;
-            if(nums[mid] >= target) r = mid;
+            if(nums[mßid] >= target) r = mid;
             else l = mid + 1;
         }
         return l;
@@ -145,7 +147,7 @@ public:
 ```
 ## 36. 有效的数独
 
-![](36.png)
+![](/36.png)
 
 ```c++
 class Solution {
@@ -178,7 +180,7 @@ public:
 ```
 ## 37. 解数独
 
-![](37.png)
+![](/37.png)
 
 ```c++
 class Solution {
@@ -222,7 +224,7 @@ public:
 ```
 ## 38. 外观数列
 
-![](38.png)
+![](/38.png)
 
 ```c++
 class Solution {
@@ -247,7 +249,7 @@ public:
 ```
 ## 39. 组合总和
 
-![](39.png)
+![](/39.png)
 
 ```c++
 class Solution {
@@ -280,7 +282,7 @@ public:
 ```
 ## 40. 组合总和 II
 
-![](40.png)
+![](/40.png)
 
 ```c++
 class Solution {
