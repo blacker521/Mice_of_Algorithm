@@ -39,25 +39,28 @@ public:
 ```c++
 class Solution {
 public:
-
-    int work(string s)
-    {
-        int res = 0;
-        for(int i = 0,start = 0,cnt = 0;i <s.size();i ++)
-            if(s[i] == '(') cnt ++;
-            else
-            { 
-                cnt --;
-                if(cnt < 0) start  = i + 1,cnt = 0;
-                else if(!cnt) res = max(res,i - start + 1);
-            }
-        return res;
-    }
     int longestValidParentheses(string s) {
-        int res = work(s);
-        reverse(s.begin(),s.end());
-        for(auto &c : s) c ^= 1;
-        return max(res,work(s));
+        stack<int> stk;
+
+        int res = 0;
+        for(int i = 0,start = -1;i < s.size();i ++)
+        {
+            if(s[i] == '(') stk.push(i);
+            else
+            {
+                if(stk.size())
+                {
+                    stk.pop();
+                    if(stk.size())res = max(res,i - stk.top());
+                    else res = max(res,i - start);
+                }
+                else
+                {
+                    start = i;
+                }
+            }
+        }
+        return res;
     }
 };
 ```
@@ -70,26 +73,24 @@ class Solution {
 public:
     int search(vector<int>& nums, int target) {
         if(nums.empty()) return -1;
-        
         int l = 0,r = nums.size() - 1;
         while(l < r)
         {
-            int mid = l + r >> 1;
-            if(nums[mid] <= nums.back()) r = mid;
-            else l = mid + 1;
+            int mid = l + r + 1 >> 1;
+            if(nums[mid] >= nums[0])l = mid;
+            else r = mid - 1;
         }
 
-        if(target <= nums.back()) r = nums.size() - 1;
-        else l = 0,r --;
-
+        if(target >= nums[0])l = 0;
+        else l = r + 1,r = nums.size() - 1;
+        
         while(l < r)
         {
             int mid = l + r >> 1;
             if(nums[mid] >= target) r = mid;
             else l = mid + 1;
         }
-
-        if(nums[l] == target) return l;
+        if(nums[r] == target) return r;
         return -1;
     }
 };
@@ -185,41 +186,42 @@ public:
 ```c++
 class Solution {
 public:
-    bool row[9][9] = {0},col[9][9] = {0},cell[3][3][9] = {0};//初始化
+    bool row[9][9],col[9][9],cell[3][3][9];
+    
     void solveSudoku(vector<vector<char>>& board) {
-        for(int i = 0;i < 9;i ++)
+        memset(row,0,sizeof row);
+        memset(col,0,sizeof col);
+        memset(cell,0,sizeof cell);
+
+        for(int i = 0; i < 9 ;i ++ )
             for(int j = 0;j < 9;j ++)
             {
-                char c = board[i][j];
-                if(c != '.')
+                if(board[i][j] != '.')
                 {
-                    int t = c - '1';
+                    int t = board[i][j] - '1';
                     row[i][t] = col[j][t] = cell[i / 3][j / 3][t] = true;
                 }
             }
-
-        dfs(board,0,0);//左上角开始走
+        dfs(board,0,0);
     }
-
-    bool dfs(vector<vector<char>> &board,int x,int y)
+    bool dfs(vector<vector<char>> & board,int x,int y)
     {
-        if(y == 9) x ++ ,y = 0;//出界就去下一行
-        if(x == 9) return true;//整个数都做完了
-        if(board[x][y] != '.') return dfs(board,x,y + 1);//已经填了数，调到下一个
+        if(y == 9) x ++,y = 0;
+        if(x == 9) return true;
 
+        if(board[x][y] != '.') return dfs(board,x,y + 1);
         for(int i = 0;i < 9;i ++)
-        {
             if(!row[x][i] && !col[y][i] && !cell[x / 3][y / 3][i])
             {
-                board[x][y] = '1' + i;//更新状态
+                board[x][y] = '1' + i;
                 row[x][i] = col[y][i] = cell[x / 3][y / 3][i] = true;
                 if(dfs(board,x,y + 1)) return true;
+                board[x][y] = '.';
                 row[x][i] = col[y][i] = cell[x / 3][y / 3][i] = false;
-                board[x][y] = '.';//恢复状态
             }
-        }
         return false;
     }
+
 };
 ```
 ## 38. 外观数列
