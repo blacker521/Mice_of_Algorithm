@@ -419,6 +419,26 @@ public:
         return abs(left - right) <= 1;
     }
 };
+
+/**
+
+class Solution {
+public:
+    bool ans = true;
+    bool isBalanced(TreeNode* root) {
+        dfs(root);
+        return ans;
+    }
+    int dfs(TreeNode* root)
+    {
+        if(!root) return 0;
+        int rh = dfs(root->left);
+        int lh = dfs(root->right);
+        if(abs(rh - lh) > 1) ans = false;
+        return max(rh,lh) + 1;
+    }
+};
+**/
 ```
 ## 111. 二叉树的最小深度
 
