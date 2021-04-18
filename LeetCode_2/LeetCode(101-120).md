@@ -717,18 +717,31 @@ public:
 ```c++
 class Solution {
 public:
-    vector<int> getRow(int rowIndex) {
-        vector<int> last(rowIndex + 1), now(rowIndex + 1);
-        last[0] = 1;
-        for (int i = 0; i < rowIndex; i ++ )
+    vector<int> getRow(int n) {
+        vector<vector<int>> f(n +1 ,vector<int>(n +1));
+        for(int i = 0;i <= n ;i ++)
         {
-            now[0] = last[0];
-            for (int j = 0; j + 1 <= i; j ++ )
-                now[j + 1] = last[j] + last[j + 1];
-            now[i + 1] = last[i];
-            last = now;
+            f[i][0] = 1,f[i][i] = 1;
+            for(int j =1;j <i;j++)
+                f[i][j] = f[i -1][j - 1] + f[i -1][j];
         }
-        return last;
+        return f[n];
+    }
+};
+/*滚动数组*/
+/*把f的第一维变成2,只用两维计算*/
+/*再把f[][]的第一维都加一个& 1*/
+class Solution {
+public:
+    vector<int> getRow(int n) {
+        vector<vector<int>> f(2,vector<int>(n +1));
+        for(int i = 0;i <= n ;i ++)
+        {
+            f[i & 1][0] = 1,f[i & 1][i] = 1;
+            for(int j =1;j <i;j++)
+                f[i & 1][j] = f[i -1 & 1][j - 1] + f[i -1 & 1][j];
+        }
+        return f[n & 1];
     }
 };
 ```
