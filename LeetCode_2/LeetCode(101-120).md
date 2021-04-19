@@ -750,7 +750,7 @@ public:
 ![](120.png)
 
 ```c++
-class Solution {
+/*class Solution {
 public:
     int minimumTotal(vector<vector<int>>& triangle) {
         int n = triangle.size();
@@ -766,6 +766,17 @@ public:
         long long res= INT_MAX;
         for(int i = 0;i < n;i ++) res = min(res,f[n - 1 & 1][i]);//枚举最后一行的状态
         return res;
+    }
+};*/
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& f) {
+        for(int i = f.size() - 2;i >= 0; i--)
+        {
+            for(int j = 0;j <= i;j ++)
+                f[i][j] += min(f[i + 1][j],f[i + 1][j + 1]);
+        }
+        return f[0][0];
     }
 };
 ```
